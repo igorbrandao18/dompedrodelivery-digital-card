@@ -1,0 +1,56 @@
+name: Deploy Digital Card to K3s
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build-and-deploy:
+    name: Build & Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build image
+        run: |
+          docker build \
+            --build-arg NEXT_PUBLIC_API_URL=https://api.dompedrodelivery.com.br/api \
+            -t dompedro-digital-card:latest .
+          docker save dompedro-digital-card:latest | gzip > /tmp/digital-card.tar.gz
+
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.VPS_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts 2>/dev/null
+
+      - name: Upload image + manifest
+        run: |
+          scp -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
+            /tmp/digital-card.tar.gz \
+            ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/tmp/digital-card.tar.gz
+
+          rsync -az \
+            -e "ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no" \
+            k8s/ ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/opt/dompedrodelivery-digital-card/k8s/
+
+      - name: Deploy to K3s
+        run: |
+          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
+            ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} << 'EOF'
+            set -e
+
+            # Import image into K3s
+            gunzip -c /tmp/digital-card.tar.gz | k3s ctr images import -
+            rm -f /tmp/digital-card.tar.gz
+
+            # Apply manifest (deployment + service + HPA + ingress)
+            kubectl apply -f /opt/dompedrodelivery-digital-card/k8s/deployment.yaml
+
+            # Restart deployment
+            kubectl rollout restart deployment digital-card -n dompedro
+            kubectl rollout status deployment/digital-card -n dompedro --timeout=120s
+
+            echo "Digital Card deploy OK"
+          EOF
