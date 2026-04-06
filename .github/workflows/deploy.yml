@@ -23,14 +23,10 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.VPS_SSH_KEY }}" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
-          ssh-keyscan -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts 2>/dev/null || true
+          ssh-keyscan -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts 2>/dev/null
 
       - name: Upload image + manifest
         run: |
-          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
-            ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} \
-            "mkdir -p /opt/dompedrodelivery-digital-card/k8s"
-
           scp -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
             /tmp/digital-card.tar.gz \
             ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/tmp/digital-card.tar.gz
@@ -49,12 +45,12 @@ jobs:
             gunzip -c /tmp/digital-card.tar.gz | k3s ctr images import -
             rm -f /tmp/digital-card.tar.gz
 
-            # Apply manifest (deployment + service + HPA + ingress)
+            # Apply manifest
             kubectl apply -f /opt/dompedrodelivery-digital-card/k8s/deployment.yaml
 
             # Restart deployment
             kubectl rollout restart deployment digital-card -n dompedro
-            kubectl rollout status deployment/digital-card -n dompedro --timeout=300s
+            kubectl rollout status deployment/digital-card -n dompedro --timeout=60s
 
             echo "Digital Card deploy OK"
           EOF
