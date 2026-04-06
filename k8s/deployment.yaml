@@ -1,12 +1,21 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: digital-card
+  namespace: dompedro
+spec:
+  selector:
+    app: digital-card
+  ports:
+    - port: 3003
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: digital-card
   namespace: dompedro
-  labels:
-    app: digital-card
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: digital-card
@@ -17,91 +26,14 @@ spec:
     spec:
       containers:
         - name: digital-card
-          image: dompedro/digital-card:latest
+          image: dompedro-digital-card:latest
+          imagePullPolicy: Never
           ports:
             - containerPort: 3000
-          env:
-            - name: NEXT_PUBLIC_API_URL
-              value: "https://api.dompedrodelivery.com.br/api"
           resources:
             requests:
-              memory: "128Mi"
-              cpu: "100m"
+              cpu: 100m
+              memory: 128Mi
             limits:
-              memory: "256Mi"
-              cpu: "500m"
-          livenessProbe:
-            httpGet:
-              path: /
-              port: 3000
-            initialDelaySeconds: 10
-            periodSeconds: 30
-          readinessProbe:
-            httpGet:
-              path: /
-              port: 3000
-            initialDelaySeconds: 5
-            periodSeconds: 10
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: digital-card
-  namespace: dompedro
-spec:
-  selector:
-    app: digital-card
-  ports:
-    - port: 3000
-      targetPort: 3000
----
-apiVersion: autoscaling/v2
-kind: HorizontalPodAutoscaler
-metadata:
-  name: digital-card-hpa
-  namespace: dompedro
-spec:
-  scaleTargetRef:
-    apiVersion: apps/v1
-    kind: Deployment
-    name: digital-card
-  minReplicas: 2
-  maxReplicas: 10
-  metrics:
-    - type: Resource
-      resource:
-        name: cpu
-        target:
-          type: Utilization
-          averageUtilization: 70
-    - type: Resource
-      resource:
-        name: memory
-        target:
-          type: Utilization
-          averageUtilization: 80
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: digital-card-ingress
-  namespace: dompedro
-  annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-prod
-spec:
-  ingressClassName: traefik
-  tls:
-    - hosts:
-        - "*.dompedrodelivery.com.br"
-      secretName: wildcard-dompedro-tls
-  rules:
-    - host: "*.dompedrodelivery.com.br"
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: digital-card
-                port:
-                  number: 3000
+              cpu: 500m
+              memory: 256Mi
