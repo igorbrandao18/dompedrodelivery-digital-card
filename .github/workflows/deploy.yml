@@ -27,6 +27,10 @@ jobs:
 
       - name: Upload image + manifest
         run: |
+          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
+            ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} \
+            "mkdir -p /opt/dompedrodelivery-digital-card/k8s"
+
           scp -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
             /tmp/digital-card.tar.gz \
             ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/tmp/digital-card.tar.gz
