@@ -54,7 +54,7 @@ jobs:
 
             # Restart deployment
             kubectl rollout restart deployment digital-card -n dompedro
-            kubectl rollout status deployment/digital-card -n dompedro --timeout=120s
+            kubectl rollout status deployment/digital-card -n dompedro --timeout=300s
 
             echo "Digital Card deploy OK"
           EOF
