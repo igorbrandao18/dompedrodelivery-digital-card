@@ -1,0 +1,3 @@
+module.exports=[64433,a=>{a.v({className:"inter_5972bc34-module__OU16Qa__className"})},43504,a=>{"use strict";var b=a.i(41097),c=a.i(64433);let d={className:c.default.className,style:{fontFamily:"'Inter', 'Inter Fallback'",fontStyle:"normal"}};null!=c.default.variable&&(d.variable=c.default.variable),a.s(["default",0,function({children:a}){return(0,b.jsx)("html",{lang:"pt-BR",className:`${d.className} h-full antialiased`,children:(0,b.jsx)("body",{className:"min-h-full bg-gray-50",children:a})})},"metadata",0,{title:"Dom Pedro Delivery — Cardápio Digital",description:"Faça seu pedido online diretamente pelo cardápio digital."}],43504)},61756,a=>{a.n(a.i(43504))}];
+
+//# sourceMappingURL=%5Broot-of-the-server%5D__08ntgmp._.js.map
