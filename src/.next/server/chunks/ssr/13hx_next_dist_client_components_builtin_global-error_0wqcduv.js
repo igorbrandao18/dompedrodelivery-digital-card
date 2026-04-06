@@ -1,3 +1,0 @@
-module.exports=[85071,(a,b,c)=>{let{createClientModuleProxy:d}=a.r(47373);a.n(d("[project]/dompedrodelivery-digital-card/node_modules/next/dist/client/components/builtin/global-error.js <module evaluation>"))},14380,(a,b,c)=>{let{createClientModuleProxy:d}=a.r(47373);a.n(d("[project]/dompedrodelivery-digital-card/node_modules/next/dist/client/components/builtin/global-error.js"))},62218,a=>{"use strict";a.i(85071);var b=a.i(14380);a.n(b)},86258,a=>{a.n(a.i(62218))}];
-
-//# sourceMappingURL=13hx_next_dist_client_components_builtin_global-error_0wqcduv.js.map
