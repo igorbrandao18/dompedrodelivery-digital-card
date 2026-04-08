@@ -415,6 +415,7 @@ export function OrdersTab({
               value={reviewComment}
               onChange={(e) => setReviewComment(e.target.value)}
               rows={3}
+              maxLength={500}
               className="w-full rounded-[12px] border border-[#E5E7EB] bg-white px-4 py-3 text-[14px] text-[#111827] placeholder-[#9CA3AF] outline-none focus:border-[#DC2626] focus:ring-1 focus:ring-[#DC2626] resize-none"
             />
             {reviewError && (

@@ -105,7 +105,7 @@ export function useProductDetail(product: MenuProduct): UseProductDetailResult {
 
   return {
     quantity,
-    incrementQty: () => setQuantity((q) => q + 1),
+    incrementQty: () => setQuantity((q) => Math.min(99, q + 1)),
     decrementQty: () => setQuantity((q) => Math.max(1, q - 1)),
     selectedOptions,
     toggleOption,

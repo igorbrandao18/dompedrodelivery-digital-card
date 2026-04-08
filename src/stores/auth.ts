@@ -1,7 +1,6 @@
 "use client";
 
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
 
@@ -14,7 +13,6 @@ export interface AuthUser {
 
 interface AuthState {
   user: AuthUser | null;
-  token: string | null;
   _ready: boolean;
 
   requestOtp: (phone: string) => Promise<void>;
@@ -52,100 +50,72 @@ async function authFetch<T = unknown>(
   return res.json();
 }
 
-export const useAuthStore = create<AuthState>()(
-  persist(
-    (set, get) => ({
-      user: null,
-      token: null,
-      _ready: false,
+export const useAuthStore = create<AuthState>()((set, get) => ({
+  user: null,
+  _ready: false,
 
-      requestOtp: async (phone: string) => {
-        await authFetch("/auth/otp/request", {
-          method: "POST",
-          body: JSON.stringify({ phone }),
-        });
-      },
+  requestOtp: async (phone: string) => {
+    await authFetch("/auth/otp/request", {
+      method: "POST",
+      body: JSON.stringify({ phone }),
+    });
+  },
 
-      verifyOtp: async (phone: string, code: string) => {
-        const data = await authFetch<{
-          isNewUser: boolean;
-          otpToken?: string;
-          user?: AuthUser;
-          accessToken?: string;
-        }>("/auth/otp/verify", {
-          method: "POST",
-          body: JSON.stringify({ phone, code }),
-        });
+  verifyOtp: async (phone: string, code: string) => {
+    const data = await authFetch<{
+      isNewUser: boolean;
+      otpToken?: string;
+      user?: AuthUser;
+    }>("/auth/otp/verify", {
+      method: "POST",
+      body: JSON.stringify({ phone, code }),
+    });
 
-        if (!data.isNewUser && data.user) {
-          if (typeof window !== "undefined") {
-            sessionStorage.setItem("dp_auth", "1");
-          }
-          set({ user: data.user, token: data.accessToken || null });
-        }
-
-        return { isNewUser: data.isNewUser, otpToken: data.otpToken };
-      },
-
-      completeRegistration: async (
-        phone: string,
-        otpToken: string,
-        name: string
-      ) => {
-        const data = await authFetch<{ user: AuthUser; accessToken?: string }>(
-          "/auth/otp/complete",
-          {
-            method: "POST",
-            body: JSON.stringify({ phone, otpToken, name }),
-          }
-        );
-        if (typeof window !== "undefined") {
-          sessionStorage.setItem("dp_auth", "1");
-        }
-        set({ user: data.user, token: data.accessToken || null });
-      },
-
-      logout: async () => {
-        try {
-          await authFetch("/auth/logout", { method: "POST" });
-        } catch {
-          // ignore logout errors
-        }
-        if (typeof window !== "undefined") {
-          sessionStorage.removeItem("dp_auth");
-        }
-        set({ user: null, token: null });
-      },
-
-      isAuthenticated: () => {
-        if (typeof window !== "undefined") {
-          return sessionStorage.getItem("dp_auth") === "1";
-        }
-        return !!get().user;
-      },
-
-      restoreSession: async () => {
-        if (typeof window === "undefined") {
-          set({ _ready: true });
-          return;
-        }
-        const flag = sessionStorage.getItem("dp_auth");
-        if (flag !== "1") {
-          set({ user: null, token: null, _ready: true });
-          return;
-        }
-        try {
-          const data = await authFetch<AuthUser>("/auth/me");
-          set({ user: data, _ready: true });
-        } catch {
-          sessionStorage.removeItem("dp_auth");
-          set({ user: null, token: null, _ready: true });
-        }
-      },
-    }),
-    {
-      name: "dompedro-auth",
-      partialize: (state) => ({ user: state.user, token: state.token }),
+    if (!data.isNewUser && data.user) {
+      set({ user: data.user });
     }
-  )
-);
+
+    return { isNewUser: data.isNewUser, otpToken: data.otpToken };
+  },
+
+  completeRegistration: async (
+    phone: string,
+    otpToken: string,
+    name: string
+  ) => {
+    const data = await authFetch<{ user: AuthUser }>(
+      "/auth/otp/complete",
+      {
+        method: "POST",
+        body: JSON.stringify({ phone, otpToken, name }),
+      }
+    );
+    set({ user: data.user });
+  },
+
+  logout: async () => {
+    try {
+      await authFetch("/auth/logout", { method: "POST" });
+    } catch {
+      // ignore logout errors
+    }
+    set({ user: null });
+  },
+
+  isAuthenticated: () => {
+    return get().user !== null;
+  },
+
+  restoreSession: async () => {
+    if (typeof window === "undefined") {
+      set({ _ready: true });
+      return;
+    }
+    try {
+      const data = await authFetch<AuthUser>("/auth/me");
+      set({ user: data, _ready: true });
+    } catch {
+      set({ user: null, _ready: true });
+    }
+  },
+}));

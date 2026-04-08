@@ -435,6 +435,7 @@ export function AuthModal({ onClose, onSuccess }: AuthModalProps) {
                   className={inputClass}
                   autoComplete="name"
                   autoFocus
+                  maxLength={100}
                 />
               </div>
 

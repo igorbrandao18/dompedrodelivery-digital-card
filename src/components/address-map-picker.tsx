@@ -189,9 +189,9 @@ export function AddressMapPicker({ onConfirm, onBack, saveRef }: AddressMapPicke
       const data = await reverseGeocode(lat, lng);
       if (data?.address) {
         const a = data.address;
-        setStreet(a.road || a.pedestrian || a.street || "");
-        setNeighborhood(a.suburb || a.neighbourhood || a.district || "");
-        setCity(a.city || a.town || a.village || a.municipality || "");
+        setStreet((a.road || a.pedestrian || a.street || "").slice(0, 200));
+        setNeighborhood((a.suburb || a.neighbourhood || a.district || "").slice(0, 100));
+        setCity((a.city || a.town || a.village || a.municipality || "").slice(0, 100));
         setState(a.state_code?.toUpperCase() || "");
         setZipCode(a.postcode ? formatCep(a.postcode) : "");
       }
@@ -211,9 +211,9 @@ export function AddressMapPicker({ onConfirm, onBack, saveRef }: AddressMapPicke
       setCepLoading(true);
       const data = await lookupCep(digits);
       if (data) {
-        setStreet(data.logradouro || street);
-        setNeighborhood(data.bairro || neighborhood);
-        setCity(data.localidade || city);
+        setStreet((data.logradouro || street).slice(0, 200));
+        setNeighborhood((data.bairro || neighborhood).slice(0, 100));
+        setCity((data.localidade || city).slice(0, 100));
         setState(data.uf || state);
 
         // Geocode the new address to move the mini map
@@ -418,6 +418,7 @@ export function AddressMapPicker({ onConfirm, onBack, saveRef }: AddressMapPicke
               disabled={noNumber}
               className={`${inputClass} flex-1 ${noNumber ? "opacity-50" : ""}`}
               autoFocus
+              maxLength={20}
             />
             <label className="flex items-center gap-2 text-[13px] text-[#6B7280] cursor-pointer whitespace-nowrap">
               <input
@@ -440,6 +441,7 @@ export function AddressMapPicker({ onConfirm, onBack, saveRef }: AddressMapPicke
             value={complement}
             onChange={(e) => setComplement(e.target.value)}
             className={inputClass}
+            maxLength={100}
           />
         </div>
 
@@ -452,6 +454,7 @@ export function AddressMapPicker({ onConfirm, onBack, saveRef }: AddressMapPicke
             value={referenceNote}
             onChange={(e) => setReferenceNote(e.target.value)}
             className={inputClass}
+            maxLength={200}
           />
         </div>
 
