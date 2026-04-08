@@ -42,13 +42,13 @@ export function OtpStep({
         Código de verificação
       </h2>
       <p className="text-[14px] text-[#6B7280] text-center -mt-2">
-        Enviamos um código de 4 dígitos para
+        Enviamos um código de 6 dígitos para
         <br />
         <span className="font-bold text-[#111827]">{phone}</span>
       </p>
 
       <div className="flex justify-center gap-3">
-        {[0, 1, 2, 3].map((i) => (
+        {[0, 1, 2, 3, 4, 5].map((i) => (
           <input
             key={i}
             ref={(el) => {
@@ -61,7 +61,7 @@ export function OtpStep({
             onChange={(e) => onOtpChange(i, e.target.value)}
             onKeyDown={(e) => onOtpKeyDown(i, e)}
             disabled={loading}
-            className={`h-14 w-14 rounded-[12px] border-2 bg-white text-center text-[24px] font-bold text-[#111827] outline-none transition-colors disabled:opacity-50 ${
+            className={`h-12 w-11 rounded-[10px] border-2 bg-white text-center text-[22px] font-bold text-[#111827] outline-none transition-colors disabled:opacity-50 ${
               otp[i]
                 ? "border-[#DC2626]"
                 : "border-[#E5E7EB] focus:border-[#DC2626] focus:ring-1 focus:ring-[#DC2626]"

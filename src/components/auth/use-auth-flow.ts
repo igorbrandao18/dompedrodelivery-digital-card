@@ -8,7 +8,7 @@ type Step = 1 | 2 | 3;
 export function useAuthFlow(onClose: () => void, onSuccess: () => void) {
   const [step, setStep] = useState<Step>(1);
   const [phone, setPhone] = useState("");
-  const [otp, setOtp] = useState(["", "", "", ""]);
+  const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [name, setName] = useState("");
   const [isNewUser, setIsNewUser] = useState(false);
   const [otpToken, setOtpToken] = useState("");
@@ -76,7 +76,7 @@ export function useAuthFlow(onClose: () => void, onSuccess: () => void) {
         }
       } catch (err: unknown) {
         setError(err instanceof Error ? err.message : "Código inválido.");
-        setOtp(["", "", "", ""]);
+        setOtp(["", "", "", "", "", ""]);
         setTimeout(() => otpRefs.current[0]?.focus(), 100);
       } finally {
         setLoading(false);
@@ -89,9 +89,9 @@ export function useAuthFlow(onClose: () => void, onSuccess: () => void) {
     if (!/^\d*$/.test(value)) return;
     const digit = value.slice(-1);
     const next = [...otp]; next[index] = digit; setOtp(next);
-    if (digit && index < 3) otpRefs.current[index + 1]?.focus();
+    if (digit && index < 5) otpRefs.current[index + 1]?.focus();
     const filled = digit && next.every((d) => d !== "");
-    if ((digit && index === 3 && next.join("").length === 4) || filled) handleVerifyOtp(next.join(""));
+    if ((digit && index === 5 && next.join("").length === 6) || filled) handleVerifyOtp(next.join(""));
   };
 
   const handleOtpKeyDown = (i: number, e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -101,7 +101,7 @@ export function useAuthFlow(onClose: () => void, onSuccess: () => void) {
   const handleResend = async () => {
     if (countdown > 0) return;
     setError(null); setLoading(true);
-    try { await requestOtp(phone.replace(/\D/g, "")); startCountdown(); setOtp(["", "", "", ""]); setTimeout(() => otpRefs.current[0]?.focus(), 100); }
+    try { await requestOtp(phone.replace(/\D/g, "")); startCountdown(); setOtp(["", "", "", "", "", ""]); setTimeout(() => otpRefs.current[0]?.focus(), 100); }
     catch (err: unknown) { setError(err instanceof Error ? err.message : "Erro ao reenviar código."); }
     finally { setLoading(false); }
   };
@@ -118,7 +118,7 @@ export function useAuthFlow(onClose: () => void, onSuccess: () => void) {
   const handleBack = () => {
     setError(null);
     if (step === 1) onClose();
-    else if (step === 2) { setOtp(["", "", "", ""]); if (countdownRef.current) clearInterval(countdownRef.current); setStep(1); }
+    else if (step === 2) { setOtp(["", "", "", "", "", ""]); if (countdownRef.current) clearInterval(countdownRef.current); setStep(1); }
     else if (step === 3) { setStep(2); startCountdown(); }
   };
 
