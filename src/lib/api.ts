@@ -1,4 +1,4 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
+import { API_URL } from "@/lib/constants";
 
 const KNOWN_ERRORS: Record<string, string> = {
   "Invalid credentials": "Credenciais inválidas.",

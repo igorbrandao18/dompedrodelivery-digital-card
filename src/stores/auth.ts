@@ -1,8 +1,7 @@
 "use client";
 
 import { create } from "zustand";
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
+import { apiFetch } from "@/lib/api";
 
 export interface AuthUser {
   id: string;
@@ -30,39 +29,19 @@ interface AuthState {
   restoreSession: () => Promise<void>;
 }
 
-async function authFetch<T = unknown>(
-  path: string,
-  options?: RequestInit
-): Promise<T> {
-  const res = await fetch(`${API_URL}${path}`, {
-    ...options,
-    credentials: "include",
-    headers: {
-      "Content-Type": "application/json",
-      ...(options?.headers || {}),
-    },
-  });
-  if (!res.ok) {
-    const body = await res.json().catch(() => ({}));
-    throw new Error(body.message || body.detail || `Erro ${res.status}`);
-  }
-  if (res.status === 204) return undefined as T;
-  return res.json();
-}
-
 export const useAuthStore = create<AuthState>()((set, get) => ({
   user: null,
   _ready: false,
 
   requestOtp: async (phone: string) => {
-    await authFetch("/auth/otp/request", {
+    await apiFetch("/auth/otp/request", {
       method: "POST",
       body: JSON.stringify({ phone }),
     });
   },
 
   verifyOtp: async (phone: string, code: string) => {
-    const data = await authFetch<{
+    const data = await apiFetch<{
       isNewUser: boolean;
       otpToken?: string;
       user?: AuthUser;
@@ -83,7 +62,7 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
     otpToken: string,
     name: string
   ) => {
-    const data = await authFetch<{ user: AuthUser }>(
+    const data = await apiFetch<{ user: AuthUser }>(
       "/auth/otp/complete",
       {
         method: "POST",
@@ -95,7 +74,7 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
 
   logout: async () => {
     try {
-      await authFetch("/auth/logout", { method: "POST" });
+      await apiFetch("/auth/logout", { method: "POST" });
     } catch {
       // ignore logout errors
     }
@@ -112,7 +91,7 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
       return;
     }
     try {
-      const data = await authFetch<AuthUser>("/auth/me");
+      const data = await apiFetch<AuthUser>("/auth/me");
       set({ user: data, _ready: true });
     } catch {
       set({ user: null, _ready: true });

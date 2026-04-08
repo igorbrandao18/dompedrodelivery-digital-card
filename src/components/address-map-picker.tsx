@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { MapPin, Navigation, Loader2 } from "lucide-react";
 import type { UserAddress } from "@/lib/types";
+import { ErrorAlert } from "@/components/ui/error-alert";
 
 interface AddressMapPickerProps {
   onConfirm: (address: Omit<UserAddress, "id" | "isDefault">) => void;
@@ -459,11 +460,7 @@ export function AddressMapPicker({ onConfirm, onBack, saveRef }: AddressMapPicke
         </div>
 
         {/* Error */}
-        {formError && (
-          <div className="rounded-[8px] bg-red-50 px-3 py-2">
-            <p className="text-[13px] text-[#DC2626]">{formError}</p>
-          </div>
-        )}
+        {formError && <ErrorAlert message={formError} />}
 
         {/* Spacer for fixed footer button */}
         <div className="h-4" />

@@ -3,26 +3,7 @@
 import { create } from "zustand";
 import type { UserAddress, FulfillmentMode, PaymentMethod, CartLine } from "@/lib/types";
 import { BASE_DELIVERY_FEE, FAST_DELIVERY_SURCHARGE } from "@/lib/constants";
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
-
-function authFetch<T = unknown>(path: string, options?: RequestInit): Promise<T> {
-  return fetch(`${API_URL}${path}`, {
-    ...options,
-    credentials: "include",
-    headers: {
-      "Content-Type": "application/json",
-      ...(options?.headers || {}),
-    },
-  }).then(async (res) => {
-    if (!res.ok) {
-      const body = await res.json().catch(() => ({}));
-      throw new Error(body.message || body.detail || `Erro ${res.status}`);
-    }
-    if (res.status === 204) return undefined as T;
-    return res.json();
-  });
-}
+import { apiFetch } from "@/lib/api";
 
 interface CheckoutState {
   fulfillmentMode: FulfillmentMode;
@@ -78,7 +59,7 @@ export const useCheckoutStore = create<CheckoutState>()((set, get) => ({
   fetchAddresses: async (userId: string) => {
     set({ loading: true, error: null });
     try {
-      const data = await authFetch<UserAddress[] | { results: UserAddress[] }>(
+      const data = await apiFetch<UserAddress[] | { results: UserAddress[] }>(
         `/users/${userId}/addresses`
       );
       const addresses = Array.isArray(data) ? data : data.results || [];
@@ -101,7 +82,7 @@ export const useCheckoutStore = create<CheckoutState>()((set, get) => ({
   addAddress: async (userId: string, data: Omit<UserAddress, "id">) => {
     set({ loading: true, error: null });
     try {
-      const newAddr = await authFetch<UserAddress>(
+      const newAddr = await apiFetch<UserAddress>(
         `/users/${userId}/addresses`,
         {
           method: "POST",
@@ -126,7 +107,7 @@ export const useCheckoutStore = create<CheckoutState>()((set, get) => ({
   deleteAddress: async (userId: string, addressId: string) => {
     set({ loading: true, error: null });
     try {
-      await authFetch(`/users/${userId}/addresses/${addressId}`, {
+      await apiFetch(`/users/${userId}/addresses/${addressId}`, {
         method: "DELETE",
       });
       set((s) => ({
@@ -148,11 +129,11 @@ export const useCheckoutStore = create<CheckoutState>()((set, get) => ({
     set({ loading: true, error: null });
     try {
       // 1. Clear server cart
-      await authFetch("/cart", { method: "DELETE" });
+      await apiFetch("/cart", { method: "DELETE" });
 
       // 2. Add each line to server cart
       for (const line of lines) {
-        await authFetch(`/cart/items/${line.productId}`, {
+        await apiFetch(`/cart/items/${line.productId}`, {
           method: "POST",
           body: JSON.stringify({
             quantity: line.quantity,
@@ -176,7 +157,7 @@ export const useCheckoutStore = create<CheckoutState>()((set, get) => ({
         orderBody.cashChangeAmount = cashChangeAmount;
       }
 
-      const order = await authFetch<{ id: string }>("/orders", {
+      const order = await apiFetch<{ id: string }>("/orders", {
         method: "POST",
         body: JSON.stringify(orderBody),
       });

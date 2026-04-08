@@ -16,9 +16,9 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { formatCurrency } from "@/lib/format";
+import { apiFetch } from "@/lib/api";
+import { ErrorAlert } from "@/components/ui/error-alert";
 import type { OrderDetail, OrderDetailItem } from "@/lib/types";
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
 
 interface OrderItem {
   id: string;
@@ -92,13 +92,9 @@ export function OrdersTab({
   const fetchOrders = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${API_URL}/orders/?limit=20`, {
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-      });
-      if (!res.ok) throw new Error("Erro ao buscar pedidos");
-      const data = await res.json();
-      setOrders(Array.isArray(data) ? data : data.results || data.items || []);
+      const data = await apiFetch<Order[] | { results?: Order[]; items?: Order[] }>("/orders/?limit=20");
+      const list = Array.isArray(data) ? data : (data as { results?: Order[]; items?: Order[] }).results || (data as { results?: Order[]; items?: Order[] }).items || [];
+      setOrders(list);
     } catch {
       setOrders([]);
     } finally {
@@ -109,12 +105,7 @@ export function OrdersTab({
   const fetchOrderDetail = useCallback(async (orderId: string) => {
     setDetailLoading(true);
     try {
-      const res = await fetch(`${API_URL}/orders/${orderId}`, {
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-      });
-      if (!res.ok) throw new Error("Erro ao buscar detalhes");
-      const data: OrderDetail = await res.json();
+      const data = await apiFetch<OrderDetail>(`/orders/${orderId}`);
       setSelectedOrder(data);
     } catch {
       // ignore
@@ -128,13 +119,10 @@ export function OrdersTab({
     setReviewSubmitting(true);
     setReviewError(null);
     try {
-      const res = await fetch(`${API_URL}/orders/${selectedOrder.id}/review`, {
+      await apiFetch(`/orders/${selectedOrder.id}/review`, {
         method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ rating: reviewRating, comment: reviewComment }),
       });
-      if (!res.ok) throw new Error("Erro ao enviar avaliação. Tente novamente.");
       setReviewSubmitted(true);
     } catch (err) {
       setReviewError(
@@ -418,11 +406,7 @@ export function OrdersTab({
               maxLength={500}
               className="w-full rounded-[12px] border border-[#E5E7EB] bg-white px-4 py-3 text-[14px] text-[#111827] placeholder-[#9CA3AF] outline-none focus:border-[#DC2626] focus:ring-1 focus:ring-[#DC2626] resize-none"
             />
-            {reviewError && (
-              <div className="flex items-center gap-2 rounded-[8px] bg-red-50 px-3 py-2">
-                <p className="text-[13px] text-[#DC2626]">{reviewError}</p>
-              </div>
-            )}
+            {reviewError && <ErrorAlert message={reviewError} />}
             <button
               type="button"
               onClick={handleSubmitReview}
