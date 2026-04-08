@@ -20,9 +20,13 @@ export function BottomTabs({
   cartCount,
 }: BottomTabsProps) {
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-[#E5E7EB] bg-white shadow-[0_-2px_8px_rgba(0,0,0,0.08)]">
-      <div className="mx-auto flex max-w-2xl items-center justify-around"
-        style={{ height: 56, paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
+    <div className="fixed bottom-0 left-0 right-0 z-50 bg-[#DC2626]">
+      <div
+        className="mx-auto flex max-w-2xl items-center justify-around"
+        style={{
+          height: 64,
+          paddingBottom: "env(safe-area-inset-bottom, 0px)",
+        }}
       >
         {tabs.map(({ key, label, Icon }) => {
           const isActive = activeTab === key;
@@ -31,20 +35,23 @@ export function BottomTabs({
               key={key}
               type="button"
               onClick={() => onTabChange(key)}
-              className="flex flex-1 flex-col items-center justify-center gap-0.5 transition-colors"
-              style={{ color: isActive ? "#DC2626" : "#6B7280" }}
+              className="flex flex-1 flex-col items-center justify-center gap-1 transition-colors"
             >
               <div className="relative">
-                <Icon size={24} strokeWidth={isActive ? 2.2 : 1.8} />
+                <Icon
+                  size={22}
+                  strokeWidth={isActive ? 2.4 : 1.6}
+                  className={isActive ? "text-white" : "text-white/70"}
+                />
                 {key === "cardapio" && cartCount > 0 && (
-                  <span className="absolute -right-2 -top-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-[#DC2626] px-1 text-[10px] font-bold text-white">
+                  <span className="absolute -right-2.5 -top-1.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-white px-1 text-[10px] font-bold text-[#DC2626]">
                     {cartCount > 99 ? "99+" : cartCount}
                   </span>
                 )}
               </div>
               <span
-                className="font-medium"
-                style={{ fontSize: 10, lineHeight: "14px" }}
+                className={`${isActive ? "text-white font-bold" : "text-white/70 font-medium"}`}
+                style={{ fontSize: 11, lineHeight: "14px" }}
               >
                 {label}
               </span>

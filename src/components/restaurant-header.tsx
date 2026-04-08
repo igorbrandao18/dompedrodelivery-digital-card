@@ -24,8 +24,8 @@ export function RestaurantHeader({ restaurant }: RestaurantHeaderProps) {
             <ShoppingBag className="h-16 w-16 text-[#DC2626] opacity-40" />
           </div>
         )}
-        {/* Overlay */}
-        <div className="absolute inset-0 bg-[rgba(0,0,0,0.12)]" />
+        {/* Red gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[rgba(180,20,20,0.55)] via-[rgba(0,0,0,0.10)] to-[rgba(0,0,0,0.05)]" />
       </div>
 
       {/* White card overlapping banner */}
@@ -33,30 +33,28 @@ export function RestaurantHeader({ restaurant }: RestaurantHeaderProps) {
         <div className="flex items-start justify-between">
           {/* Left: restaurant info */}
           <div className="flex-1 pr-4">
-            <h1 className="text-[22px] font-[800] leading-tight text-[#111827]">
+            <h1 className="text-[22px] font-[800] leading-tight tracking-[-0.4px] text-[#111827]">
               {restaurant.name}
             </h1>
 
-            <div className="mt-2 flex flex-wrap items-center gap-3 text-[14px] text-[#6B7280]">
+            <div className="mt-3 flex flex-wrap items-center gap-2">
               {restaurant.rating != null && (
-                <span className="flex items-center gap-1">
-                  <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                  <span className="font-medium text-[#111827]">
-                    {restaurant.rating.toFixed(1)}
-                  </span>
+                <span className="flex items-center gap-1 rounded-full bg-[#FEF3C7] px-2.5 py-1 text-[12px] font-semibold text-[#92400E]">
+                  <Star className="h-3.5 w-3.5 fill-[#F59E0B] text-[#F59E0B]" />
+                  {restaurant.rating.toFixed(1)}
                   {restaurant.ratingCount != null && (
-                    <span>({restaurant.ratingCount})</span>
+                    <span className="font-normal text-[#B45309]">({restaurant.ratingCount})</span>
                   )}
                 </span>
               )}
 
-              <span className="flex items-center gap-1">
-                <Clock className="h-4 w-4" />
+              <span className="flex items-center gap-1 rounded-full bg-[#FEE2E2] px-2.5 py-1 text-[12px] font-semibold text-[#DC2626]">
+                <Clock className="h-3.5 w-3.5" />
                 {restaurant.estimatedDeliveryMinutes} min
               </span>
 
-              <span className="flex items-center gap-1">
-                <Package className="h-4 w-4" />
+              <span className="flex items-center gap-1 rounded-full bg-[#FEE2E2] px-2.5 py-1 text-[12px] font-semibold text-[#DC2626]">
+                <Package className="h-3.5 w-3.5" />
                 Min. {formatCurrency(restaurant.minOrderValue)}
               </span>
             </div>
@@ -70,9 +68,9 @@ export function RestaurantHeader({ restaurant }: RestaurantHeaderProps) {
 
           {/* Right: logo */}
           {restaurant.logoUrl && (
-            <div className="-mt-10">
+            <div className="-mt-16">
               <div
-                className="h-[72px] w-[72px] overflow-hidden rounded-full border-2 border-[rgba(220,38,38,0.35)] shadow-[0_2px_8px_rgba(220,38,38,0.2)]"
+                className="h-[120px] w-[120px] overflow-hidden rounded-full border-[3px] border-[rgba(220,38,38,0.35)] shadow-[0_4px_12px_rgba(220,38,38,0.25)]"
               >
                 <img
                   src={restaurant.logoUrl}

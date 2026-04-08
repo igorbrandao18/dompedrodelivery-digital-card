@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { apiFetch } from "@/lib/api";
 import type { Restaurant, MenuCategory } from "@/lib/types";
 
@@ -18,7 +18,7 @@ export function useRestaurant(slug: string): UseRestaurantResult {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  const load = async () => {
+  const load = useCallback(async () => {
     if (!slug) return;
     setLoading(true);
     setError("");
@@ -37,11 +37,11 @@ export function useRestaurant(slug: string): UseRestaurantResult {
     } finally {
       setLoading(false);
     }
-  };
+  }, [slug]);
 
   useEffect(() => {
     load();
-  }, [slug]);
+  }, [load]);
 
   return { restaurant, categories, loading, error, refresh: load };
 }

@@ -7,9 +7,8 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
 
 export interface AuthUser {
   id: string;
-  email: string;
   name: string;
-  phone: string | null;
+  phone: string;
   role: string;
 }
 
@@ -18,16 +17,18 @@ interface AuthState {
   token: string | null;
   _ready: boolean;
 
-  login: (email: string, password: string) => Promise<void>;
-  register: (
-    name: string,
-    email: string,
-    password: string,
-    phone: string
+  requestOtp: (phone: string) => Promise<void>;
+  verifyOtp: (
+    phone: string,
+    code: string
+  ) => Promise<{ isNewUser: boolean; otpToken?: string }>;
+  completeRegistration: (
+    phone: string,
+    otpToken: string,
+    name: string
   ) => Promise<void>;
   logout: () => Promise<void>;
   isAuthenticated: () => boolean;
-  getMe: () => Promise<AuthUser>;
   restoreSession: () => Promise<void>;
 }
 
@@ -58,37 +59,50 @@ export const useAuthStore = create<AuthState>()(
       token: null,
       _ready: false,
 
-      login: async (email: string, password: string) => {
-        const data = await authFetch<{ user: AuthUser; token?: string }>(
-          "/auth/login",
-          {
-            method: "POST",
-            body: JSON.stringify({ email, password }),
-          }
-        );
-        if (typeof window !== "undefined") {
-          sessionStorage.setItem("dp_auth", "1");
-        }
-        set({ user: data.user, token: data.token || null });
+      requestOtp: async (phone: string) => {
+        await authFetch("/auth/otp/request", {
+          method: "POST",
+          body: JSON.stringify({ phone }),
+        });
       },
 
-      register: async (
-        name: string,
-        email: string,
-        password: string,
-        phone: string
+      verifyOtp: async (phone: string, code: string) => {
+        const data = await authFetch<{
+          isNewUser: boolean;
+          otpToken?: string;
+          user?: AuthUser;
+          accessToken?: string;
+        }>("/auth/otp/verify", {
+          method: "POST",
+          body: JSON.stringify({ phone, code }),
+        });
+
+        if (!data.isNewUser && data.user) {
+          if (typeof window !== "undefined") {
+            sessionStorage.setItem("dp_auth", "1");
+          }
+          set({ user: data.user, token: data.accessToken || null });
+        }
+
+        return { isNewUser: data.isNewUser, otpToken: data.otpToken };
+      },
+
+      completeRegistration: async (
+        phone: string,
+        otpToken: string,
+        name: string
       ) => {
-        const data = await authFetch<{ user: AuthUser; token?: string }>(
-          "/auth/register",
+        const data = await authFetch<{ user: AuthUser; accessToken?: string }>(
+          "/auth/otp/complete",
           {
             method: "POST",
-            body: JSON.stringify({ name, email, password, phone }),
+            body: JSON.stringify({ phone, otpToken, name }),
           }
         );
         if (typeof window !== "undefined") {
           sessionStorage.setItem("dp_auth", "1");
         }
-        set({ user: data.user, token: data.token || null });
+        set({ user: data.user, token: data.accessToken || null });
       },
 
       logout: async () => {
@@ -108,12 +122,6 @@ export const useAuthStore = create<AuthState>()(
           return sessionStorage.getItem("dp_auth") === "1";
         }
         return !!get().user;
-      },
-
-      getMe: async () => {
-        const data = await authFetch<AuthUser>("/auth/me");
-        set({ user: data });
-        return data;
       },
 
       restoreSession: async () => {

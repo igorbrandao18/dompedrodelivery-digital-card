@@ -2,7 +2,7 @@
 
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type { CartLine, MenuOption } from "@/lib/types";
+import type { CartLine } from "@/lib/types";
 
 interface CartState {
   lines: CartLine[];
@@ -24,7 +24,11 @@ export const useCartStore = create<CartState>()(
       lines: [],
 
       addItem: (item) => {
-        const lines = get().lines;
+        let lines = get().lines;
+        // Clear cart if adding item from a different restaurant
+        if (lines.length > 0 && lines[0].restaurantId !== item.restaurantId) {
+          lines = [];
+        }
         // Check if same product with same options exists
         const optKey = item.selectedOptions.map((o) => o.id).sort().join(",");
         const existing = lines.find(

@@ -63,3 +63,41 @@ export interface CartLine {
   optionsSummary: string;
   customerNote: string;
 }
+
+export interface UserAddress {
+  id: string;
+  street: string;
+  number?: string;
+  complement?: string;
+  referenceNote?: string;
+  neighborhood: string;
+  city: string;
+  state: string;
+  zipCode: string;
+  isDefault?: boolean;
+}
+
+export interface OrderDetail {
+  id: string;
+  status: string;
+  subtotal: number;
+  deliveryFee: number;
+  total: number;
+  createdAt: string;
+  paymentMethod?: string;
+  items: OrderDetailItem[];
+  restaurant: { id: string; name: string; slug: string; logoUrl?: string } | null;
+  deliveryAddress: { street: string; streetNumber?: string; complement?: string; neighborhood?: string; city?: string; state?: string } | null;
+}
+
+export interface OrderDetailItem {
+  id: string;
+  productId: string;
+  productName: string;
+  quantity: number;
+  unitPrice: number;
+  totalPrice: number;
+}
+
+export type FulfillmentMode = "delivery" | "pickup";
+export type PaymentMethod = "cash" | "credit_visa" | "credit_mastercard" | "credit_elo" | "credit_hipercard";

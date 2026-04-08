@@ -25,11 +25,11 @@ function ProductRow({
     <button
       type="button"
       onClick={() => onPress(product)}
-      className="flex w-full items-start gap-3 px-4 py-3 text-left transition-colors hover:bg-[#F9FAFB]"
+      className="flex w-full items-start gap-4 px-4 py-4 text-left transition-colors hover:bg-[#F9FAFB]"
     >
       {/* Left side */}
       <div className="min-w-0 flex-1">
-        <p className="line-clamp-2 text-[14px] font-medium text-[#111827]">
+        <p className="line-clamp-2 text-[14px] font-semibold text-[#111827]">
           {product.name}
         </p>
         {product.description && (
@@ -37,7 +37,7 @@ function ProductRow({
             {product.description}
           </p>
         )}
-        <p className="mt-1 text-[14px] font-semibold text-[#111827]">
+        <p className="mt-1.5 text-[12px] font-bold text-[#DC2626]">
           {hasVariants && (
             <span className="text-[12px] font-normal text-[#6B7280]">
               A partir de{" "}
@@ -49,7 +49,7 @@ function ProductRow({
 
       {/* Right side: thumbnail */}
       {product.imageUrl && (
-        <div className="h-[80px] w-[80px] flex-shrink-0 overflow-hidden rounded-[12px]">
+        <div className="h-[72px] w-[72px] flex-shrink-0 overflow-hidden rounded-[12px] bg-[#F9FAFB]">
           <img
             src={product.imageUrl}
             alt={product.name}
@@ -69,7 +69,7 @@ export function CategoryAccordion({
   categoryRefs,
 }: CategoryAccordionProps) {
   return (
-    <div className="flex flex-col gap-3">
+    <div>
       {categories.map((category) => {
         const isExpanded = expandedIds.has(category.id);
 
@@ -79,36 +79,38 @@ export function CategoryAccordion({
             ref={(el) => {
               categoryRefs.current[category.id] = el;
             }}
-            className="overflow-hidden rounded-[16px] border border-[#E5E7EB] bg-white"
+            className="mb-2 overflow-hidden"
           >
-            {/* Header */}
+            {/* Header — gray bg, no border */}
             <button
               type="button"
               onClick={() => onToggle(category.id)}
-              className="flex w-full items-center justify-between px-4 py-3"
+              className="flex w-full items-center justify-between bg-[#EFEFF4] px-4 py-3 min-h-[52px]"
             >
-              <div className="flex items-center gap-2">
-                <span className="text-[16px] font-bold text-[#111827]">
+              <div className="flex flex-1 items-center gap-1.5">
+                <span className="text-[12px] font-bold uppercase tracking-[0.6px] text-[#6B7280] line-clamp-2">
                   {category.name}
                 </span>
-                <span className="flex h-5 min-w-[20px] items-center justify-center rounded-full bg-[#F3F4F6] px-1.5 text-[12px] font-medium text-[#6B7280]">
-                  {category.products.length}
-                </span>
+                {isExpanded ? (
+                  <ChevronUp className="h-5 w-5 shrink-0 text-[#6B7280]" />
+                ) : (
+                  <ChevronDown className="h-5 w-5 shrink-0 text-[#6B7280]" />
+                )}
               </div>
-              {isExpanded ? (
-                <ChevronUp className="h-5 w-5 text-[#6B7280]" />
-              ) : (
-                <ChevronDown className="h-5 w-5 text-[#6B7280]" />
-              )}
+              <span className="text-[11px] font-semibold text-[#6B7280] shrink-0 ml-2">
+                {category.products.length === 1
+                  ? "1 item"
+                  : `${category.products.length} itens`}
+              </span>
             </button>
 
             {/* Products list */}
             {isExpanded && (
-              <div className="border-t border-[#E5E7EB]">
+              <div className="bg-white">
                 {category.products.map((product, idx) => (
                   <div key={product.id}>
                     {idx > 0 && (
-                      <div className="mx-4 border-t border-[rgba(229,231,235,0.5)]" />
+                      <div className="border-t border-[#E5E7EB]" />
                     )}
                     <ProductRow product={product} onPress={onProductPress} />
                   </div>

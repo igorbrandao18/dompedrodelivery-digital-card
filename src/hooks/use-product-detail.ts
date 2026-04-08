@@ -40,7 +40,18 @@ export function useProductDetail(product: MenuProduct): UseProductDetailResult {
       const group = new Set(next[groupId]);
 
       if (multi) {
-        group.has(optionId) ? group.delete(optionId) : group.add(optionId);
+        if (group.has(optionId)) {
+          group.delete(optionId);
+        } else {
+          // Enforce maxSelections limit
+          const optGroup = product.optionGroups.find((g) => g.id === groupId);
+          if (optGroup && group.size >= optGroup.maxSelections) {
+            // At max — remove the oldest selection to make room
+            const first = group.values().next().value;
+            if (first !== undefined) group.delete(first);
+          }
+          group.add(optionId);
+        }
       } else {
         group.clear();
         group.add(optionId);
@@ -61,10 +72,11 @@ export function useProductDetail(product: MenuProduct): UseProductDetailResult {
     const opts: MenuOption[] = [];
     for (const group of product.optionGroups) {
       for (const opt of group.options) {
-        if (isSelected(group.id, opt.id)) opts.push(opt);
+        if (selectedOptions[group.id]?.has(opt.id)) opts.push(opt);
       }
     }
     return opts;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedOptions, product.optionGroups]);
 
   const optionsTotal = allSelectedOptions.reduce(
@@ -75,8 +87,15 @@ export function useProductDetail(product: MenuProduct): UseProductDetailResult {
   const lineTotal = unitTotal * quantity;
 
   const groupSubtitle = (group: MenuOptionGroup): string => {
-    if (group.maxSelections > 1) return `Escolha até ${group.maxSelections}`;
-    if (group.minSelections > 0) return `Escolha ${group.minSelections}`;
+    const min = group.minSelections;
+    const max = group.maxSelections;
+
+    if (min === 0 && max <= 1) return "Opcional";
+    if (min === 0 && max > 1) return `Escolha até ${max} opções`;
+    if (min === max && min === 1) return "Escolha 1 opção";
+    if (min === max) return `Escolha ${min} opções`;
+    if (min > 0 && max > min) return `Escolha de ${min} a ${max} opções`;
+    if (min > 0) return `Escolha ${min} opção${min > 1 ? "ões" : ""}`;
     return "Opcional";
   };
 
