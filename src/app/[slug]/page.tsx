@@ -147,20 +147,22 @@ export default function CardapioPage() {
           />
 
           {/* Category accordion with products */}
-          <CategoryAccordion
-            categories={filteredCategories}
-            expandedIds={expandedCats}
-            onToggle={toggleCategory}
-            onProductPress={setSelectedProduct}
-            categoryRefs={categoryRefs}
-          />
+          <div className={!restaurant.isAcceptingOrders ? "opacity-50 pointer-events-none" : ""}>
+            <CategoryAccordion
+              categories={filteredCategories}
+              expandedIds={expandedCats}
+              onToggle={toggleCategory}
+              onProductPress={setSelectedProduct}
+              categoryRefs={categoryRefs}
+            />
 
-          {/* Empty search results */}
-          {filteredCategories.length === 0 && (
-            <div className="max-w-2xl mx-auto px-4 text-center py-12">
-              <p className="text-sm text-gray-400">Nenhum produto encontrado</p>
-            </div>
-          )}
+            {/* Empty search results */}
+            {filteredCategories.length === 0 && (
+              <div className="max-w-2xl mx-auto px-4 text-center py-12">
+                <p className="text-sm text-gray-400">Nenhum produto encontrado</p>
+              </div>
+            )}
+          </div>
 
           {/* Cart footer (above bottom tabs) */}
           {cartCount > 0 && (

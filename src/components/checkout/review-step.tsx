@@ -1,9 +1,10 @@
 "use client";
 
+import { useState } from "react";
 import type { CartLine, FulfillmentMode, UserAddress } from "@/lib/types";
 import { formatCurrency } from "@/lib/format";
 import { SERVICE_FEE } from "@/lib/constants";
-import { Truck, Store, CreditCard, Banknote } from "lucide-react";
+import { Truck, Store, CreditCard, Banknote, Tag } from "lucide-react";
 import { ErrorAlert } from "@/components/ui/error-alert";
 import { PAYMENT_OPTIONS } from "./payment-step";
 
@@ -30,6 +31,14 @@ export function ReviewStep({
   total,
   error,
 }: ReviewStepProps) {
+  const [couponCode, setCouponCode] = useState("");
+  const [couponError, setCouponError] = useState<string | null>(null);
+
+  const handleApplyCoupon = () => {
+    if (!couponCode.trim()) return;
+    setCouponError("Cupom nao encontrado");
+  };
+
   return (
     <div className="px-4 py-6 space-y-5">
       {/* Items */}
@@ -105,6 +114,34 @@ export function ReviewStep({
           <p className="text-[13px] text-[#6B7280] pl-6 mt-1">
             Troco para {formatCurrency(cashChangeAmount)}
           </p>
+        )}
+      </div>
+
+      {/* Coupon */}
+      <div className="rounded-[12px] border-2 border-dashed border-[#D1D5DB] p-3 space-y-2">
+        <div className="flex items-center gap-2 mb-1">
+          <Tag size={16} className="text-[#DC2626]" />
+          <span className="text-[14px] font-medium text-[#111827]">Cupom de desconto</span>
+        </div>
+        <div className="flex gap-2">
+          <input
+            type="text"
+            value={couponCode}
+            onChange={(e) => { setCouponCode(e.target.value.toUpperCase()); setCouponError(null); }}
+            placeholder="Digite o cupom"
+            className="flex-1 rounded-[8px] border border-[#D1D5DB] px-3 py-2 text-[14px] text-[#111827] placeholder:text-[#9CA3AF] outline-none focus:border-[#DC2626] transition-colors"
+          />
+          <button
+            type="button"
+            onClick={handleApplyCoupon}
+            className="rounded-[8px] bg-[#DC2626] px-4 py-2 text-[14px] font-semibold text-white hover:bg-[#B91C1C] transition-colors disabled:opacity-50"
+            disabled={!couponCode.trim()}
+          >
+            Aplicar
+          </button>
+        </div>
+        {couponError && (
+          <p className="text-[12px] text-[#DC2626]">{couponError}</p>
         )}
       </div>
 
