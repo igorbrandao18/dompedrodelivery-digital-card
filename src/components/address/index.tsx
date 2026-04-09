@@ -100,6 +100,8 @@ export function AddressMapPicker({
           city: data.city,
           state: data.state,
           zipCode: data.zipCode,
+          latitude: data.latitude,
+          longitude: data.longitude,
         })
       }
       saveRef={saveRef}

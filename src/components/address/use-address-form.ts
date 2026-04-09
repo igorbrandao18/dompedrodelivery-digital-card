@@ -19,6 +19,8 @@ async function lookupCep(cep: string) {
 }
 
 interface UseAddressFormOpts {
+  lat: number;
+  lng: number;
   initialStreet: string;
   initialNeighborhood: string;
   initialCity: string;
@@ -35,6 +37,8 @@ interface UseAddressFormOpts {
     city: string;
     state: string;
     zipCode: string;
+    latitude: number;
+    longitude: number;
   }) => void;
   saveRef?: React.RefObject<(() => void) | null>;
 }
@@ -105,6 +109,7 @@ export function useAddressForm(opts: UseAddressFormOpts) {
       complement: complement.trim(), referenceNote: referenceNote.trim(),
       neighborhood: neighborhood.trim(), city: city.trim(),
       state: state.trim() || "CE", zipCode: zipCode.replace(/\D/g, ""),
+      latitude: opts.lat, longitude: opts.lng,
     });
   };
 

@@ -23,6 +23,8 @@ interface AddressConfirmFormProps {
     city: string;
     state: string;
     zipCode: string;
+    latitude: number;
+    longitude: number;
   }) => void;
   saveRef?: React.RefObject<(() => void) | null>;
   onLatLngChange: (lat: number, lng: number) => void;
@@ -33,6 +35,8 @@ export function AddressConfirmForm(props: AddressConfirmFormProps) {
   const miniMapInstance = useRef<unknown>(null);
 
   const form = useAddressForm({
+    lat: props.lat,
+    lng: props.lng,
     initialStreet: props.initialStreet,
     initialNeighborhood: props.initialNeighborhood,
     initialCity: props.initialCity,
