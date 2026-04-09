@@ -7,9 +7,10 @@ import { ProfileLoggedIn } from "./profile-logged-in";
 interface ProfileTabProps {
   restaurantName: string;
   onLoginPress: () => void;
+  onSwitchTab?: (tab: string) => void;
 }
 
-export function ProfileTab({ restaurantName, onLoginPress }: ProfileTabProps) {
+export function ProfileTab({ restaurantName, onLoginPress, onSwitchTab }: ProfileTabProps) {
   const user = useAuthStore((s) => s.user);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const logout = useAuthStore((s) => s.logout);
@@ -25,6 +26,7 @@ export function ProfileTab({ restaurantName, onLoginPress }: ProfileTabProps) {
       userPhone={user.phone}
       restaurantName={restaurantName}
       onLogout={() => logout()}
+      onSwitchTab={onSwitchTab}
     />
   );
 }

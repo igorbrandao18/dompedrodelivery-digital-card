@@ -208,6 +208,7 @@ export default function CardapioPage() {
         <ProfileTab
           restaurantName={restaurant.name}
           onLoginPress={handleOpenAuth}
+          onSwitchTab={(tab) => setActiveTab(tab as typeof activeTab)}
         />
       )}
 
