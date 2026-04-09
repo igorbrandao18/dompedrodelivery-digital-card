@@ -2,19 +2,26 @@
 
 import { useState } from "react";
 import type { PaymentMethod } from "@/lib/types";
-import { Banknote, X } from "lucide-react";
+import { X } from "lucide-react";
+import {
+  VisaIcon,
+  MastercardIcon,
+  EloIcon,
+  HipercardIcon,
+  CashIcon,
+} from "./card-brand-icons";
 
-/* ── Brand colors for card icons ── */
+/* ── Card brands with real SVG icons ── */
 const CARDS = [
-  { value: "credit_visa", label: "Visa", color: "#1A1F71", letter: "V" },
-  { value: "credit_mastercard", label: "Mastercard", color: "#EB001B", letter: "M" },
-  { value: "credit_elo", label: "Elo", color: "#00A4E0", letter: "E" },
-  { value: "credit_hipercard", label: "Hipercard", color: "#822124", letter: "H" },
+  { value: "credit_visa", label: "Visa", Icon: VisaIcon },
+  { value: "credit_mastercard", label: "Mastercard", Icon: MastercardIcon },
+  { value: "credit_elo", label: "Elo", Icon: EloIcon },
+  { value: "credit_hipercard", label: "Hipercard", Icon: HipercardIcon },
 ];
 
 export const PAYMENT_OPTIONS = [
-  { value: "cash", label: "Dinheiro", icon: Banknote },
-  ...CARDS.map((c) => ({ value: c.value, label: `${c.label} (Crédito)`, icon: Banknote })),
+  { value: "cash", label: "Dinheiro" },
+  ...CARDS.map((c) => ({ value: c.value, label: `${c.label} (Crédito)` })),
 ];
 
 interface PaymentStepProps {
@@ -55,10 +62,8 @@ export function PaymentStep({
               : "bg-[#F9FAFB] hover:bg-[#F3F4F6]"
           }`}
         >
-          <div className={`flex h-11 w-11 items-center justify-center rounded-[10px] ${
-            paymentMethod === "cash" ? "bg-[#DC2626]" : "bg-[#D1FAE5]"
-          }`}>
-            <Banknote size={22} className={paymentMethod === "cash" ? "text-white" : "text-[#059669]"} />
+          <div className="flex h-11 w-[44px] items-center justify-center">
+            <CashIcon size={40} />
           </div>
           <span className="flex-1 text-left text-[15px] font-semibold text-[#111827]">
             Dinheiro
@@ -111,16 +116,8 @@ export function PaymentStep({
                 }`}
               >
                 {/* Brand icon */}
-                <div
-                  className="flex h-11 w-[44px] items-center justify-center rounded-[8px]"
-                  style={{ backgroundColor: isSelected ? card.color : `${card.color}15` }}
-                >
-                  <span
-                    className="text-[16px] font-black"
-                    style={{ color: isSelected ? "#fff" : card.color }}
-                  >
-                    {card.letter}
-                  </span>
+                <div className="flex h-11 w-[44px] items-center justify-center">
+                  <card.Icon size={40} />
                 </div>
                 <span className="flex-1 text-left text-[15px] font-semibold text-[#111827]">
                   {card.label}
