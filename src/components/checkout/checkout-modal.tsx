@@ -250,6 +250,8 @@ export function CheckoutModal({ restaurant, onClose, onSuccess }: CheckoutModalP
             deliveryFee={deliveryFee}
             total={total}
             error={error}
+            restaurantName={restaurant.name}
+            estimatedMinutes={restaurant.estimatedDeliveryMinutes}
           />
         )}
 
