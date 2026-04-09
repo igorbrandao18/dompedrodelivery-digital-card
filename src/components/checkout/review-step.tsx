@@ -1,12 +1,26 @@
 "use client";
 
-import { useState } from "react";
 import type { CartLine, FulfillmentMode, UserAddress } from "@/lib/types";
 import { formatCurrency } from "@/lib/format";
 import { SERVICE_FEE } from "@/lib/constants";
-import { Truck, Store, CreditCard, Banknote, Tag } from "lucide-react";
+import { ChevronRight, HelpCircle } from "lucide-react";
 import { ErrorAlert } from "@/components/ui/error-alert";
 import { PAYMENT_OPTIONS } from "./payment-step";
+import {
+  CashIcon,
+  VisaIcon,
+  MastercardIcon,
+  EloIcon,
+  HipercardIcon,
+} from "./card-brand-icons";
+
+const BRAND_ICONS: Record<string, React.FC<{ size?: number }>> = {
+  cash: CashIcon,
+  credit_visa: VisaIcon,
+  credit_mastercard: MastercardIcon,
+  credit_elo: EloIcon,
+  credit_hipercard: HipercardIcon,
+};
 
 interface ReviewStepProps {
   lines: CartLine[];
@@ -31,141 +45,83 @@ export function ReviewStep({
   total,
   error,
 }: ReviewStepProps) {
-  const [couponCode, setCouponCode] = useState("");
-  const [couponError, setCouponError] = useState<string | null>(null);
+  const paymentLabel =
+    PAYMENT_OPTIONS.find((o) => o.value === paymentMethod)?.label || paymentMethod;
 
-  const handleApplyCoupon = () => {
-    if (!couponCode.trim()) return;
-    setCouponError("Cupom nao encontrado");
-  };
+  const PaymentIcon = BRAND_ICONS[paymentMethod] || CashIcon;
+
+  const changeLabel =
+    paymentMethod === "cash" && cashChangeAmount
+      ? `Troco para ${formatCurrency(cashChangeAmount)}`
+      : paymentMethod === "cash"
+        ? "Sem troco"
+        : null;
 
   return (
     <div className="px-4 py-6 space-y-5">
-      {/* Items */}
+      {/* ── Payment method card (like mobile) ── */}
       <div>
-        <p className="text-[14px] font-semibold text-[#111827] mb-3">
-          Itens do pedido
+        <p className="text-[12px] font-bold text-[#9CA3AF] uppercase tracking-wider mb-3">
+          Pagamento ao receber
         </p>
-        <div className="space-y-2">
-          {lines.map((line) => {
-            const optTotal = line.selectedOptions.reduce(
-              (s, o) => s + o.priceModifier,
-              0
-            );
-            const linePrice = (line.unitPrice + optTotal) * line.quantity;
-            return (
-              <div
-                key={line.lineId}
-                className="flex items-start justify-between py-1"
-              >
-                <div className="flex-1 min-w-0">
-                  <p className="text-[14px] text-[#111827]">
-                    {line.quantity}x {line.name}
-                  </p>
-                  {line.optionsSummary && (
-                    <p className="text-[12px] text-[#6B7280] truncate">
-                      {line.optionsSummary}
-                    </p>
-                  )}
-                </div>
-                <span className="text-[14px] font-medium text-[#111827] ml-3 shrink-0">
-                  {formatCurrency(linePrice)}
-                </span>
-              </div>
-            );
-          })}
+        <div className="rounded-[14px] bg-[#F9FAFB] p-3">
+          <div className="flex items-center gap-3 rounded-[12px] bg-white p-3">
+            <PaymentIcon size={36} />
+            <div className="flex-1 min-w-0">
+              <p className="text-[14px] font-semibold text-[#111827]">
+                {paymentLabel}
+              </p>
+              {changeLabel && (
+                <p className="text-[12px] text-[#6B7280]">{changeLabel}</p>
+              )}
+            </div>
+            <ChevronRight size={16} className="text-[#D1D5DB] shrink-0" />
+          </div>
         </div>
       </div>
 
-      {/* Delivery/pickup info */}
-      <div className="rounded-[12px] border border-[#E5E7EB] p-3 space-y-2">
-        <div className="flex items-center gap-2">
-          {fulfillmentMode === "delivery" ? (
-            <Truck size={16} className="text-[#DC2626]" />
-          ) : (
-            <Store size={16} className="text-[#DC2626]" />
-          )}
-          <span className="text-[14px] font-medium text-[#111827]">
-            {fulfillmentMode === "delivery" ? "Entrega" : "Retirada na loja"}
-          </span>
-        </div>
-        {fulfillmentMode === "delivery" && selectedAddress && (
-          <p className="text-[13px] text-[#6B7280] pl-6">
-            {selectedAddress.street}
-            {selectedAddress.number ? `, ${selectedAddress.number}` : ""} -{" "}
-            {selectedAddress.neighborhood}
-          </p>
-        )}
-      </div>
+      {/* ── Summary (like mobile) ── */}
+      <div>
+        <p className="text-[12px] font-bold text-[#9CA3AF] uppercase tracking-wider mb-3">
+          Resumo de valores
+        </p>
 
-      {/* Payment info */}
-      <div className="rounded-[12px] border border-[#E5E7EB] p-3">
-        <div className="flex items-center gap-2">
-          {paymentMethod === "cash" ? (
-            <Banknote size={16} className="text-[#DC2626]" />
-          ) : (
-            <CreditCard size={16} className="text-[#DC2626]" />
-          )}
-          <span className="text-[14px] font-medium text-[#111827]">
-            {PAYMENT_OPTIONS.find((o) => o.value === paymentMethod)?.label}
-          </span>
-        </div>
-        {paymentMethod === "cash" && cashChangeAmount && (
-          <p className="text-[13px] text-[#6B7280] pl-6 mt-1">
-            Troco para {formatCurrency(cashChangeAmount)}
-          </p>
-        )}
-      </div>
+        <div className="space-y-2.5">
+          <div className="flex justify-between text-[14px]">
+            <span className="text-[#6B7280]">Subtotal</span>
+            <span className="text-[#6B7280] tabular-nums">
+              {formatCurrency(subtotal)}
+            </span>
+          </div>
 
-      {/* Coupon */}
-      <div className="rounded-[12px] border-2 border-dashed border-[#D1D5DB] p-3 space-y-2">
-        <div className="flex items-center gap-2 mb-1">
-          <Tag size={16} className="text-[#DC2626]" />
-          <span className="text-[14px] font-medium text-[#111827]">Cupom de desconto</span>
-        </div>
-        <div className="flex gap-2">
-          <input
-            type="text"
-            value={couponCode}
-            onChange={(e) => { setCouponCode(e.target.value.toUpperCase()); setCouponError(null); }}
-            placeholder="Digite o cupom"
-            className="flex-1 rounded-[8px] border border-[#D1D5DB] px-3 py-2 text-[14px] text-[#111827] placeholder:text-[#9CA3AF] outline-none focus:border-[#DC2626] transition-colors"
-          />
-          <button
-            type="button"
-            onClick={handleApplyCoupon}
-            className="rounded-[8px] bg-[#DC2626] px-4 py-2 text-[14px] font-semibold text-white hover:bg-[#B91C1C] transition-colors disabled:opacity-50"
-            disabled={!couponCode.trim()}
-          >
-            Aplicar
-          </button>
-        </div>
-        {couponError && (
-          <p className="text-[12px] text-[#DC2626]">{couponError}</p>
-        )}
-      </div>
+          <div className="flex justify-between text-[14px]">
+            <span className="text-[#6B7280]">
+              {fulfillmentMode === "pickup" ? "Retirada na loja" : "Entrega"}
+            </span>
+            <span className="text-[#6B7280] tabular-nums">
+              {fulfillmentMode === "pickup"
+                ? "Grátis"
+                : formatCurrency(deliveryFee)}
+            </span>
+          </div>
 
-      {/* Price breakdown */}
-      <div className="border-t border-[#E5E7EB] pt-4 space-y-2">
-        <div className="flex justify-between text-[14px] text-[#6B7280]">
-          <span>Subtotal</span>
-          <span>{formatCurrency(subtotal)}</span>
-        </div>
-        <div className="flex justify-between text-[14px] text-[#6B7280]">
-          <span>Entrega</span>
-          <span>
-            {fulfillmentMode === "pickup"
-              ? "Gratis"
-              : formatCurrency(deliveryFee)}
-          </span>
-        </div>
-        <div className="flex justify-between text-[14px] text-[#6B7280]">
-          <span>Taxa de servico</span>
-          <span>{formatCurrency(SERVICE_FEE)}</span>
-        </div>
-        <div className="flex justify-between border-t border-[#E5E7EB] pt-2 text-[16px] font-bold text-[#111827]">
-          <span>Total</span>
-          <span>{formatCurrency(total)}</span>
+          <div className="flex justify-between text-[14px]">
+            <div className="flex items-center gap-1.5">
+              <span className="text-[#6B7280]">Taxa de serviço</span>
+              <HelpCircle size={14} className="text-[#D1D5DB]" />
+            </div>
+            <span className="text-[#6B7280] tabular-nums">
+              {formatCurrency(SERVICE_FEE)}
+            </span>
+          </div>
+
+          {/* Total */}
+          <div className="flex justify-between pt-2 mt-1 border-t border-[#E5E7EB]">
+            <span className="text-[16px] font-bold text-[#111827]">Total</span>
+            <span className="text-[16px] font-bold text-[#111827] tabular-nums">
+              {formatCurrency(total)}
+            </span>
+          </div>
         </div>
       </div>
 
