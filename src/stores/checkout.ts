@@ -60,7 +60,7 @@ export const useCheckoutStore = create<CheckoutState>()((set, get) => ({
     set({ loading: true, error: null });
     try {
       const data = await apiFetch<UserAddress[] | { results: UserAddress[] }>(
-        `/users/${userId}/addresses`
+        `/users/${userId}/addresses/`
       );
       const addresses = Array.isArray(data) ? data : data.results || [];
       set({ addresses, loading: false });
@@ -83,7 +83,7 @@ export const useCheckoutStore = create<CheckoutState>()((set, get) => ({
     set({ loading: true, error: null });
     try {
       const newAddr = await apiFetch<UserAddress>(
-        `/users/${userId}/addresses`,
+        `/users/${userId}/addresses/`,
         {
           method: "POST",
           body: JSON.stringify(data),
@@ -107,7 +107,7 @@ export const useCheckoutStore = create<CheckoutState>()((set, get) => ({
   deleteAddress: async (userId: string, addressId: string) => {
     set({ loading: true, error: null });
     try {
-      await apiFetch(`/users/${userId}/addresses/${addressId}`, {
+      await apiFetch(`/users/${userId}/addresses/${addressId}/`, {
         method: "DELETE",
       });
       set((s) => ({

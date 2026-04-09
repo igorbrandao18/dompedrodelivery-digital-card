@@ -3,22 +3,11 @@
 import { useState } from "react";
 import type { Restaurant } from "@/lib/types";
 import { formatCurrency } from "@/lib/format";
-import { ShoppingBag, Star, Clock, Package, Truck, Share2, Info } from "lucide-react";
+import { ShoppingBag, Star, Clock, Package, Truck, Info } from "lucide-react";
 import { RestaurantInfoModal } from "./restaurant-info-modal";
 
 interface RestaurantHeaderProps {
   restaurant: Restaurant;
-}
-
-async function handleShare(name: string) {
-  const url = window.location.href;
-  const data = { title: name, text: `Confira ${name}!`, url };
-  if (navigator.share) {
-    try { await navigator.share(data); } catch { /* cancelled */ }
-  } else {
-    await navigator.clipboard.writeText(url);
-    alert("Link copiado!");
-  }
 }
 
 export function RestaurantHeader({ restaurant }: RestaurantHeaderProps) {
@@ -105,14 +94,6 @@ export function RestaurantHeader({ restaurant }: RestaurantHeaderProps) {
                 </span>
               )}
 
-              <button
-                type="button"
-                onClick={() => handleShare(restaurant.name)}
-                className="flex items-center gap-1 rounded-full bg-[#F3F4F6] px-2.5 py-1 text-[12px] font-semibold text-[#374151] hover:bg-[#E5E7EB] transition-colors"
-              >
-                <Share2 className="h-3.5 w-3.5" />
-                Compartilhar
-              </button>
             </div>
           </div>
 
