@@ -1,6 +1,6 @@
 "use client";
 
-import { MapPin, CreditCard } from "lucide-react";
+import { MapPin, CreditCard, UtensilsCrossed } from "lucide-react";
 import { formatCurrency } from "@/lib/format";
 import type { OrderDetailItem, OrderDetail } from "@/lib/types";
 import { PAYMENT_LABELS } from "./order-constants";
@@ -14,17 +14,29 @@ export function OrderItemsList({ items }: { items: OrderDetailItem[] }) {
       </p>
       <div className="divide-y divide-[#F3F4F6]">
         {items.map((item) => (
-          <div key={item.id} className="flex items-center justify-between px-4 py-3">
-            <div className="flex items-center gap-2.5 min-w-0">
-              <span className="flex h-6 min-w-[24px] items-center justify-center rounded bg-[#F3F4F6] text-[11px] font-bold text-[#6B7280]">
-                {item.quantity}x
-              </span>
-              <span className="text-[14px] text-[#111827] truncate">
+          <div key={item.id} className="flex items-center gap-3 px-4 py-3">
+            {/* Product image */}
+            {item.imageUrl ? (
+              <div className="h-[56px] w-[56px] shrink-0 overflow-hidden rounded-[8px] bg-[#F9FAFB]">
+                <img src={item.imageUrl} alt={item.productName} className="h-full w-full object-cover" />
+              </div>
+            ) : (
+              <div className="flex h-[56px] w-[56px] shrink-0 items-center justify-center rounded-[8px] bg-[#F3F4F6]">
+                <UtensilsCrossed size={18} className="text-[#D1D5DB]" />
+              </div>
+            )}
+            {/* Info */}
+            <div className="flex-1 min-w-0">
+              <p className="text-[14px] font-medium text-[#111827] truncate">
                 {item.productName}
-              </span>
+              </p>
+              <p className="text-[13px] text-[#6B7280] tabular-nums mt-0.5">
+                {formatCurrency(item.totalPrice)}
+              </p>
             </div>
-            <span className="text-[14px] text-[#6B7280] tabular-nums ml-3 shrink-0">
-              {formatCurrency(item.totalPrice)}
+            {/* Qty */}
+            <span className="flex h-6 min-w-[24px] items-center justify-center rounded-[6px] bg-[#F3F4F6] text-[11px] font-bold text-[#6B7280] shrink-0">
+              {item.quantity}×
             </span>
           </div>
         ))}

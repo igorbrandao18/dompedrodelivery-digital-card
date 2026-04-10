@@ -99,6 +99,7 @@ export interface OrderDetailItem {
   quantity: number;
   unitPrice: number;
   totalPrice: number;
+  imageUrl?: string;
 }
 
 export type FulfillmentMode = "delivery" | "pickup";
