@@ -1,6 +1,6 @@
 "use client";
 
-import { RefreshCw, ShoppingBag } from "lucide-react";
+import { ShoppingBag } from "lucide-react";
 import { OrderCard } from "./order-card";
 
 interface OrderItem {
@@ -25,33 +25,24 @@ interface Order {
 interface OrderListProps {
   orders: Order[];
   loading: boolean;
-  onRefresh: () => void;
   onSelectOrder: (orderId: string) => void;
 }
 
 export function OrderList({
   orders,
   loading,
-  onRefresh,
   onSelectOrder,
 }: OrderListProps) {
   return (
     <div className="max-w-2xl mx-auto px-4 py-4">
-      {/* Header */}
-      <div className="mb-5 flex items-center justify-between">
-        <h2 className="text-[20px] font-bold text-[#111827]">Meus pedidos</h2>
-        <button
-          type="button"
-          onClick={onRefresh}
-          disabled={loading}
-          className="flex h-9 w-9 items-center justify-center rounded-full border border-[#E5E7EB] hover:bg-[#F3F4F6] transition-colors disabled:opacity-50"
-          aria-label="Atualizar pedidos"
-        >
-          <RefreshCw
-            size={16}
-            className={`text-[#6B7280] ${loading ? "animate-spin" : ""}`}
-          />
-        </button>
+      {/* Header — mobile style */}
+      <div className="mb-4 text-center">
+        <h2 className="text-[14px] font-bold tracking-wide text-[#111827] uppercase">
+          Pedidos
+        </h2>
+        <p className="text-[12px] text-[#9CA3AF] mt-0.5">
+          Seus pedidos mais recentes
+        </p>
       </div>
 
       {/* Loading */}

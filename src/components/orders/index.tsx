@@ -94,7 +94,6 @@ export function OrdersTab({
     <OrderList
       orders={orders}
       loading={loading}
-      onRefresh={fetchOrders}
       onSelectOrder={fetchOrderDetail}
     />
   );
