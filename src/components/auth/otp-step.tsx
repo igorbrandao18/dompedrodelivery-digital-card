@@ -1,6 +1,5 @@
 "use client";
 
-import { useRef, useCallback } from "react";
 import { ErrorAlert } from "@/components/ui/error-alert";
 
 const WHATSAPP_ICON = (

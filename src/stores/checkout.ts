@@ -2,7 +2,7 @@
 
 import { create } from "zustand";
 import type { UserAddress, FulfillmentMode, PaymentMethod, CartLine } from "@/lib/types";
-import { BASE_DELIVERY_FEE, FAST_DELIVERY_SURCHARGE } from "@/lib/constants";
+import { FAST_DELIVERY_SURCHARGE } from "@/lib/constants";
 import { apiFetch } from "@/lib/api";
 
 interface CheckoutState {
@@ -24,7 +24,7 @@ interface CheckoutState {
   addAddress: (userId: string, data: Omit<UserAddress, "id">) => Promise<UserAddress>;
   deleteAddress: (userId: string, addressId: string) => Promise<void>;
   submitOrder: (lines: CartLine[], restaurantId: string) => Promise<{ id: string }>;
-  getDeliveryFee: () => number;
+  getDeliveryFee: (restaurantDeliveryFee: number) => number;
   reset: () => void;
 }
 
@@ -48,12 +48,12 @@ export const useCheckoutStore = create<CheckoutState>()((set, get) => ({
   setCashChangeAmount: (amount) => set({ cashChangeAmount: amount }),
   setSelectedAddressId: (id) => set({ selectedAddressId: id }),
 
-  getDeliveryFee: () => {
+  getDeliveryFee: (restaurantDeliveryFee: number) => {
     const { fulfillmentMode, deliveryTier } = get();
     if (fulfillmentMode === "pickup") return 0;
     return deliveryTier === "fast"
-      ? BASE_DELIVERY_FEE + FAST_DELIVERY_SURCHARGE
-      : BASE_DELIVERY_FEE;
+      ? restaurantDeliveryFee + FAST_DELIVERY_SURCHARGE
+      : restaurantDeliveryFee;
   },
 
   fetchAddresses: async (userId: string) => {

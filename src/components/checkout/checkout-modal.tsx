@@ -72,7 +72,7 @@ export function CheckoutModal({ restaurant, onClose, onSuccess }: CheckoutModalP
   const resetCheckout = useCheckoutStore((s) => s.reset);
 
   const subtotal = getSubtotal();
-  const deliveryFee = getDeliveryFee();
+  const deliveryFee = getDeliveryFee(restaurant.deliveryFee);
   const total = subtotal + deliveryFee + SERVICE_FEE;
 
   const selectedAddress = addresses.find((a) => a.id === selectedAddressId);
@@ -199,6 +199,7 @@ export function CheckoutModal({ restaurant, onClose, onSuccess }: CheckoutModalP
             fulfillmentMode={fulfillmentMode}
             deliveryTier={deliveryTier}
             selectedAddress={selectedAddress}
+            restaurantDeliveryFee={restaurant.deliveryFee}
             onSetFulfillmentMode={setFulfillmentMode}
             onSetDeliveryTier={setDeliveryTier}
           />

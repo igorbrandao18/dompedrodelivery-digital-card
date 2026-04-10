@@ -66,7 +66,7 @@ export function OrdersTab({
 
   const fetchOrderDetail = useCallback(async (orderId: string) => {
     try {
-      const data = await apiFetch<OrderDetailType>(`/orders/${orderId}`);
+      const data = await apiFetch<OrderDetailType>(`/orders/${orderId}/`);
       setSelectedOrder(data);
     } catch {
       // ignore

@@ -57,19 +57,19 @@ describe("Checkout Flow (E2E)", () => {
 
   it("getDeliveryFee returns 0 for pickup", () => {
     useCheckoutStore.getState().setFulfillmentMode("pickup");
-    expect(useCheckoutStore.getState().getDeliveryFee()).toBe(0);
+    expect(useCheckoutStore.getState().getDeliveryFee(5.99)).toBe(0);
   });
 
-  it("getDeliveryFee returns base fee for standard delivery", () => {
+  it("getDeliveryFee returns restaurant fee for standard delivery", () => {
     useCheckoutStore.getState().setFulfillmentMode("delivery");
     useCheckoutStore.getState().setDeliveryTier("standard");
-    expect(useCheckoutStore.getState().getDeliveryFee()).toBe(5.99);
+    expect(useCheckoutStore.getState().getDeliveryFee(5.99)).toBe(5.99);
   });
 
-  it("getDeliveryFee returns base + surcharge for fast delivery", () => {
+  it("getDeliveryFee returns restaurant fee + surcharge for fast delivery", () => {
     useCheckoutStore.getState().setFulfillmentMode("delivery");
     useCheckoutStore.getState().setDeliveryTier("fast");
-    expect(useCheckoutStore.getState().getDeliveryFee()).toBe(5.99 + 3.0);
+    expect(useCheckoutStore.getState().getDeliveryFee(5.99)).toBe(5.99 + 3.0);
   });
 
   it("submitOrder calls DELETE /cart, POST items, POST /orders in sequence", async () => {

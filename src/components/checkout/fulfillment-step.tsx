@@ -3,7 +3,7 @@
 import type { FulfillmentMode } from "@/lib/types";
 import type { UserAddress } from "@/lib/types";
 import { formatCurrency } from "@/lib/format";
-import { BASE_DELIVERY_FEE, FAST_DELIVERY_SURCHARGE } from "@/lib/constants";
+import { FAST_DELIVERY_SURCHARGE } from "@/lib/constants";
 import {
   Truck,
   Store,
@@ -18,6 +18,7 @@ interface FulfillmentStepProps {
   fulfillmentMode: FulfillmentMode;
   deliveryTier: "standard" | "fast";
   selectedAddress: UserAddress | undefined;
+  restaurantDeliveryFee: number;
   onSetFulfillmentMode: (mode: FulfillmentMode) => void;
   onSetDeliveryTier: (tier: "standard" | "fast") => void;
 }
@@ -26,6 +27,7 @@ export function FulfillmentStep({
   fulfillmentMode,
   deliveryTier,
   selectedAddress,
+  restaurantDeliveryFee,
   onSetFulfillmentMode,
   onSetDeliveryTier,
 }: FulfillmentStepProps) {
@@ -119,7 +121,7 @@ export function FulfillmentStep({
               <p className="text-[12px] text-[#6B7280]">40-60 min</p>
             </div>
             <span className="text-[14px] font-bold text-[#111827]">
-              {formatCurrency(BASE_DELIVERY_FEE)}
+              {formatCurrency(restaurantDeliveryFee)}
             </span>
           </button>
 
@@ -138,7 +140,7 @@ export function FulfillmentStep({
               <p className="text-[12px] text-[#6B7280]">20-35 min</p>
             </div>
             <span className="text-[14px] font-bold text-[#111827]">
-              {formatCurrency(BASE_DELIVERY_FEE + FAST_DELIVERY_SURCHARGE)}
+              {formatCurrency(restaurantDeliveryFee + FAST_DELIVERY_SURCHARGE)}
             </span>
           </button>
         </div>

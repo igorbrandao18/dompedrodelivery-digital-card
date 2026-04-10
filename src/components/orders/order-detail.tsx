@@ -32,7 +32,7 @@ export function OrderDetail({ order, onBack }: OrderDetailProps) {
     setReviewSubmitting(true);
     setReviewError(null);
     try {
-      await apiFetch(`/orders/${order.id}/review`, {
+      await apiFetch(`/orders/${order.id}/review/`, {
         method: "POST",
         body: JSON.stringify({ rating: reviewRating, comment: reviewComment }),
       });

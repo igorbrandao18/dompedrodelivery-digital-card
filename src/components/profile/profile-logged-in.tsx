@@ -12,11 +12,6 @@ import {
   FileText,
   Shield,
   Phone,
-  Trash2,
-  Home,
-  X,
-  Banknote,
-  Check,
 } from "lucide-react";
 import { useCheckoutStore } from "@/stores/checkout";
 import { useAuthStore } from "@/stores/auth";
