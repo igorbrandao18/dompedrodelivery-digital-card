@@ -252,9 +252,12 @@ export function CheckoutModal({ restaurant, onClose, onSuccess }: CheckoutModalP
             total={total}
             error={error}
             restaurantName={restaurant.name}
+            restaurantLogo={restaurant.logoUrl}
             estimatedMinutes={restaurant.estimatedDeliveryMinutes}
+            deliveryTier={deliveryTier}
             onEditAddress={() => setStep(fulfillmentMode === "delivery" ? "address-select" : "fulfillment")}
             onEditPayment={() => setStep("payment")}
+            onEditItems={onClose}
           />
         )}
 
