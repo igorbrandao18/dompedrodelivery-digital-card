@@ -29,15 +29,63 @@ function sanitizeError(status: number, message?: string): string {
   }
 }
 
+// ── Refresh mutex ──
+let refreshPromise: Promise<boolean> | null = null;
+
+async function tryRefreshOnce(): Promise<boolean> {
+  try {
+    const res = await fetch(`${API_URL}/auth/refresh`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({}),
+      credentials: "include",
+    });
+    return res.ok;
+  } catch {
+    return false;
+  }
+}
+
+function tryRefresh(): Promise<boolean> {
+  if (refreshPromise) return refreshPromise;
+  refreshPromise = tryRefreshOnce().finally(() => {
+    refreshPromise = null;
+  });
+  return refreshPromise;
+}
+
+// ── Main fetch function ──
 export async function apiFetch<T = unknown>(path: string, options?: RequestInit): Promise<T> {
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+    ...(options?.headers as Record<string, string> || {}),
+  };
+
   const res = await fetch(`${API_URL}${path}`, {
     ...options,
     credentials: "include",
-    headers: {
-      "Content-Type": "application/json",
-      ...(options?.headers || {}),
-    },
+    headers,
   });
+
+  // Auto-refresh on 401
+  if (res.status === 401) {
+    const refreshed = await tryRefresh();
+    if (refreshed) {
+      const retry = await fetch(`${API_URL}${path}`, {
+        ...options,
+        credentials: "include",
+        headers,
+      });
+      if (!retry.ok) {
+        const body = await retry.json().catch(() => ({}));
+        throw new Error(sanitizeError(retry.status, body.message || body.detail));
+      }
+      if (retry.status === 204) return undefined as T;
+      return retry.json();
+    }
+    throw new Error(sanitizeError(401));
+  }
+
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
     throw new Error(sanitizeError(res.status, body.message || body.detail));
