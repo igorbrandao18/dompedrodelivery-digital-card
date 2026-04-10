@@ -6,6 +6,7 @@ import { useCartStore } from "@/stores/cart";
 import { useCheckoutStore } from "@/stores/checkout";
 import { useAuthStore } from "@/stores/auth";
 import { SERVICE_FEE } from "@/lib/constants";
+import { formatCurrency } from "@/lib/format";
 import { ArrowLeft } from "lucide-react";
 import { AddressMapPicker } from "@/components/address-map-picker";
 import { PrimaryButton } from "@/components/ui/primary-button";
@@ -252,6 +253,8 @@ export function CheckoutModal({ restaurant, onClose, onSuccess }: CheckoutModalP
             error={error}
             restaurantName={restaurant.name}
             estimatedMinutes={restaurant.estimatedDeliveryMinutes}
+            onEditAddress={() => setStep(fulfillmentMode === "delivery" ? "address-select" : "fulfillment")}
+            onEditPayment={() => setStep("payment")}
           />
         )}
 
@@ -318,7 +321,7 @@ export function CheckoutModal({ restaurant, onClose, onSuccess }: CheckoutModalP
               onClick={handleSubmitOrder}
               loading={loading}
             >
-              Fazer pedido
+              Fazer pedido · {formatCurrency(total)}
             </PrimaryButton>
           </div>
         </div>
