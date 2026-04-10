@@ -26,20 +26,20 @@ export function OrderReview({
 }: OrderReviewProps) {
   if (submitted) {
     return (
-      <div className="rounded-[16px] bg-green-50 p-4 text-center">
+      <div className="rounded-2xl bg-green-50 p-5 text-center mb-4">
         <Star
-          size={24}
+          size={28}
           className="mx-auto mb-2 fill-[#FBBF24] text-[#FBBF24]"
         />
-        <p className="text-[14px] font-bold text-green-800">
-          Avaliação enviada! Obrigado.
+        <p className="text-[15px] font-bold text-green-800">
+          Avaliacao enviada! Obrigado.
         </p>
       </div>
     );
   }
 
   return (
-    <div className="rounded-[16px] border border-[#E5E7EB] bg-white overflow-hidden p-4 space-y-4">
+    <div className="rounded-2xl bg-white shadow-[0_1px_4px_rgba(0,0,0,0.08)] p-4 space-y-4 mb-4">
       <p className="text-[16px] font-bold text-[#111827] text-center">
         Como foi seu pedido?
       </p>
@@ -63,21 +63,21 @@ export function OrderReview({
         ))}
       </div>
       <textarea
-        placeholder="Conte como foi sua experiência (opcional)"
+        placeholder="Conte como foi sua experiencia (opcional)"
         value={comment}
         onChange={(e) => onCommentChange(e.target.value)}
         rows={3}
         maxLength={500}
-        className="w-full rounded-[12px] border border-[#E5E7EB] bg-white px-4 py-3 text-[14px] text-[#111827] placeholder-[#9CA3AF] outline-none focus:border-[#DC2626] focus:ring-1 focus:ring-[#DC2626] resize-none"
+        className="w-full rounded-xl border border-[#E5E7EB] bg-white px-4 py-3 text-[14px] text-[#111827] placeholder-[#9CA3AF] outline-none focus:border-[#DC2626] focus:ring-1 focus:ring-[#DC2626] resize-none"
       />
       {error && <ErrorAlert message={error} />}
       <button
         type="button"
         onClick={onSubmit}
         disabled={rating === 0 || submitting}
-        className="flex h-12 w-full items-center justify-center rounded-[12px] bg-[#DC2626] text-[16px] font-bold text-white transition-colors hover:bg-[#B91C1C] disabled:opacity-[0.45]"
+        className="flex h-12 w-full items-center justify-center rounded-xl bg-[#DC2626] text-[15px] font-bold text-white transition-colors hover:bg-[#B91C1C] disabled:opacity-[0.45]"
       >
-        {submitting ? "Enviando..." : "Enviar avaliação"}
+        {submitting ? "Enviando..." : "Enviar avaliacao"}
       </button>
     </div>
   );

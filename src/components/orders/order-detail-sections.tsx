@@ -5,22 +5,25 @@ import { formatCurrency } from "@/lib/format";
 import type { OrderDetailItem, OrderDetail } from "@/lib/types";
 import { PAYMENT_LABELS } from "./order-constants";
 
+/* ---------- Items list ---------- */
 export function OrderItemsList({ items }: { items: OrderDetailItem[] }) {
   return (
-    <div className="rounded-[16px] border border-[#E5E7EB] bg-white overflow-hidden mb-4">
-      <div className="px-4 py-3 border-b border-[#E5E7EB]">
-        <p className="text-[14px] font-bold text-[#111827]">Itens</p>
-      </div>
+    <div className="rounded-2xl bg-white shadow-[0_1px_4px_rgba(0,0,0,0.08)] overflow-hidden mb-4">
+      <p className="px-4 pt-4 pb-2 text-[14px] font-bold text-[#111827]">
+        Itens do pedido
+      </p>
       <div className="divide-y divide-[#F3F4F6]">
         {items.map((item) => (
           <div key={item.id} className="flex items-center justify-between px-4 py-3">
-            <div className="flex items-center gap-2">
-              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#F3F4F6] text-[11px] font-bold text-[#6B7280]">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <span className="flex h-6 min-w-[24px] items-center justify-center rounded bg-[#F3F4F6] text-[11px] font-bold text-[#6B7280]">
                 {item.quantity}x
               </span>
-              <span className="text-[14px] text-[#111827]">{item.productName}</span>
+              <span className="text-[14px] text-[#111827] truncate">
+                {item.productName}
+              </span>
             </div>
-            <span className="text-[14px] font-medium text-[#6B7280] tabular-nums ml-3 shrink-0">
+            <span className="text-[14px] text-[#6B7280] tabular-nums ml-3 shrink-0">
               {formatCurrency(item.totalPrice)}
             </span>
           </div>
@@ -30,22 +33,28 @@ export function OrderItemsList({ items }: { items: OrderDetailItem[] }) {
   );
 }
 
-export function OrderAddress({ address }: { address: NonNullable<OrderDetail["deliveryAddress"]> }) {
+/* ---------- Address ---------- */
+export function OrderAddress({
+  address,
+}: {
+  address: NonNullable<OrderDetail["deliveryAddress"]>;
+}) {
   return (
-    <div className="rounded-[16px] border border-[#E5E7EB] bg-white overflow-hidden mb-4">
-      <div className="flex items-center gap-3 px-4 py-3">
-        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#FEE2E2] shrink-0">
+    <div className="rounded-2xl bg-white shadow-[0_1px_4px_rgba(0,0,0,0.08)] p-4 mb-4">
+      <div className="flex items-start gap-3">
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#FEE2E2]">
           <MapPin size={16} className="text-[#DC2626]" />
         </div>
         <div>
-          <p className="text-[14px] font-medium text-[#111827]">
+          <p className="text-[13px] font-bold text-[#111827] mb-0.5">
+            Endereco de entrega
+          </p>
+          <p className="text-[13px] text-[#6B7280]">
             {address.street}
             {address.streetNumber ? `, ${address.streetNumber}` : ""}
+            {address.complement ? ` - ${address.complement}` : ""}
           </p>
-          {address.complement && (
-            <p className="text-[12px] text-[#6B7280]">{address.complement}</p>
-          )}
-          <p className="text-[12px] text-[#6B7280]">
+          <p className="text-[12px] text-[#9CA3AF]">
             {address.neighborhood}
             {address.city ? ` - ${address.city}` : ""}
           </p>
@@ -55,21 +64,28 @@ export function OrderAddress({ address }: { address: NonNullable<OrderDetail["de
   );
 }
 
+/* ---------- Payment ---------- */
 export function OrderPayment({ method }: { method: string }) {
   return (
-    <div className="rounded-[16px] border border-[#E5E7EB] bg-white overflow-hidden mb-4">
-      <div className="flex items-center gap-3 px-4 py-3">
-        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#FEE2E2] shrink-0">
+    <div className="rounded-2xl bg-white shadow-[0_1px_4px_rgba(0,0,0,0.08)] p-4 mb-4">
+      <div className="flex items-center gap-3">
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#FEE2E2]">
           <CreditCard size={16} className="text-[#DC2626]" />
         </div>
-        <span className="text-[14px] font-medium text-[#111827]">
-          {PAYMENT_LABELS[method] || method}
-        </span>
+        <div>
+          <p className="text-[13px] font-bold text-[#111827] mb-0.5">
+            Pagamento
+          </p>
+          <p className="text-[13px] text-[#6B7280]">
+            {PAYMENT_LABELS[method] || method}
+          </p>
+        </div>
       </div>
     </div>
   );
 }
 
+/* ---------- Price summary ---------- */
 export function OrderPriceSummary({
   subtotal,
   deliveryFee,
@@ -80,19 +96,21 @@ export function OrderPriceSummary({
   total: number;
 }) {
   return (
-    <div className="rounded-[16px] border border-[#E5E7EB] bg-white overflow-hidden mb-4 px-4 py-3 space-y-2">
-      <p className="text-[14px] font-bold text-[#111827] mb-2">Resumo</p>
-      <div className="flex justify-between text-[14px] text-[#6B7280]">
+    <div className="rounded-2xl bg-white shadow-[0_1px_4px_rgba(0,0,0,0.08)] p-4 mb-4 space-y-2">
+      <p className="text-[14px] font-bold text-[#111827] mb-2">
+        Resumo de valores
+      </p>
+      <div className="flex justify-between text-[13px] text-[#6B7280]">
         <span>Subtotal</span>
         <span className="tabular-nums">{formatCurrency(subtotal)}</span>
       </div>
-      <div className="flex justify-between text-[14px] text-[#6B7280]">
-        <span>Entrega</span>
+      <div className="flex justify-between text-[13px] text-[#6B7280]">
+        <span>Taxa de entrega</span>
         <span className="tabular-nums">
-          {deliveryFee > 0 ? formatCurrency(deliveryFee) : "Grátis"}
+          {deliveryFee > 0 ? formatCurrency(deliveryFee) : "Gratis"}
         </span>
       </div>
-      <div className="flex justify-between border-t border-[#E5E7EB] pt-2 text-[16px] font-bold text-[#111827]">
+      <div className="flex justify-between border-t border-[#F3F4F6] pt-2 text-[16px] font-bold text-[#111827]">
         <span>Total</span>
         <span className="tabular-nums">{formatCurrency(total)}</span>
       </div>

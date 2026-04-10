@@ -19,7 +19,7 @@ interface Order {
   total: number;
   createdAt: string;
   items: OrderItem[];
-  restaurant?: { name: string; logoUrl?: string } | null;
+  restaurant?: { name: string; slug?: string; logoUrl?: string } | null;
 }
 
 interface OrderListProps {
@@ -38,15 +38,8 @@ export function OrderList({
   return (
     <div className="max-w-2xl mx-auto px-4 py-4">
       {/* Header */}
-      <div className="mb-4 flex items-center justify-between">
-        <div>
-          <h2 className="text-[20px] font-bold text-[#111827]">
-            Meus pedidos
-          </h2>
-          <p className="text-[13px] text-[#6B7280]">
-            Seus pedidos mais recentes
-          </p>
-        </div>
+      <div className="mb-5 flex items-center justify-between">
+        <h2 className="text-[20px] font-bold text-[#111827]">Meus pedidos</h2>
         <button
           type="button"
           onClick={onRefresh}
@@ -94,6 +87,8 @@ export function OrderList({
             total={order.total}
             createdAt={order.createdAt}
             items={order.items}
+            restaurantName={order.restaurant?.name}
+            restaurantLogo={order.restaurant?.logoUrl}
             onPress={() => onSelectOrder(order.id)}
           />
         ))}

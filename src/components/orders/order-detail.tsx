@@ -1,11 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowLeft, Star, Package } from "lucide-react";
+import { ArrowLeft, Star, Store } from "lucide-react";
 import { apiFetch } from "@/lib/api";
 import type { OrderDetail as OrderDetailType } from "@/lib/types";
 import { OrderReview } from "./order-review";
 import { STATUS_CONFIG, formatDate } from "./order-constants";
+import { OrderProgress } from "./order-progress";
 import {
   OrderItemsList,
   OrderAddress,
@@ -38,51 +39,65 @@ export function OrderDetail({ order, onBack }: OrderDetailProps) {
       setReviewSubmitted(true);
     } catch (err) {
       setReviewError(
-        err instanceof Error ? err.message : "Erro ao enviar avaliação."
+        err instanceof Error ? err.message : "Erro ao enviar avaliacao."
       );
     } finally {
       setReviewSubmitting(false);
     }
   };
 
-  const status = STATUS_CONFIG[order.status] || {
-    label: order.status,
-    bg: "bg-gray-50",
-    text: "text-gray-700",
-    icon: Package,
-  };
+  const cfg = STATUS_CONFIG[order.status] || STATUS_CONFIG.PENDING;
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-4">
-      {/* Back + title */}
+      {/* Header */}
       <div className="mb-4 flex items-center gap-3">
         <button
           type="button"
           onClick={onBack}
-          className="flex h-8 w-8 items-center justify-center rounded-full hover:bg-[#F3F4F6] transition-colors"
+          className="flex h-9 w-9 items-center justify-center rounded-full hover:bg-[#F3F4F6] transition-colors"
         >
           <ArrowLeft size={20} className="text-[#111827]" />
         </button>
         <h2 className="text-[18px] font-bold text-[#111827]">
-          Pedido #{order.id.slice(0, 6)}
+          Detalhes do pedido
         </h2>
       </div>
 
-      {/* Status card */}
-      <div className={`rounded-[16px] ${status.bg} p-4 mb-4`}>
+      {/* Status banner */}
+      <div className={`rounded-2xl ${cfg.bg} p-4 mb-4`}>
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white">
-            <status.icon size={20} className={status.text} />
+          <div className="flex h-11 w-11 items-center justify-center rounded-full bg-white/80">
+            <cfg.icon size={22} className={cfg.text} />
           </div>
           <div>
-            <p className={`text-[16px] font-bold ${status.text}`}>
-              {status.label}
-            </p>
+            <p className={`text-[16px] font-bold ${cfg.text}`}>{cfg.label}</p>
             <p className="text-[12px] text-[#6B7280]">
               {formatDate(order.createdAt)}
             </p>
           </div>
         </div>
+      </div>
+
+      {/* Progress steps */}
+      <OrderProgress status={order.status} />
+
+      {/* Restaurant info */}
+      <div className="rounded-2xl bg-white shadow-[0_1px_4px_rgba(0,0,0,0.08)] p-4 mb-4 flex items-center gap-3">
+        {order.restaurant?.logoUrl ? (
+          <img
+            src={order.restaurant.logoUrl}
+            alt=""
+            className="h-10 w-10 rounded-full object-cover border border-[#E5E7EB]"
+          />
+        ) : (
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#F3F4F6]">
+            <Store size={18} className="text-[#9CA3AF]" />
+          </div>
+        )}
+        <p className="text-[15px] font-bold text-[#111827]">
+          {order.restaurant?.name || "Restaurante"}
+        </p>
       </div>
 
       <OrderItemsList items={order.items} />
@@ -99,7 +114,7 @@ export function OrderDetail({ order, onBack }: OrderDetailProps) {
         <button
           type="button"
           onClick={() => setShowReview(true)}
-          className="flex w-full items-center justify-center gap-2 rounded-[12px] bg-[#DC2626] px-4 py-3 text-[16px] font-bold text-white transition-colors hover:bg-[#B91C1C]"
+          className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#DC2626] px-4 py-3.5 text-[15px] font-bold text-white transition-colors hover:bg-[#B91C1C] mb-4"
         >
           <Star size={18} />
           Avaliar pedido
