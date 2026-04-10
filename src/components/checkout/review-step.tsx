@@ -93,13 +93,24 @@ export function ReviewStep({
               <UtensilsCrossed size={20} className="text-[#9CA3AF]" />
             </div>
           )}
-          <p className="text-[16px] font-bold text-[#111827]">
-            {restaurantName || "Restaurante"}
-          </p>
+          <div className="flex-1">
+            <p className="text-[16px] font-bold text-[#111827]">
+              {restaurantName || "Restaurante"}
+            </p>
+            {onEditItems && (
+              <button
+                type="button"
+                onClick={onEditItems}
+                className="text-[14px] font-semibold text-[#DC2626] mt-0.5"
+              >
+                Adicionar mais itens
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Items section title */}
-        <p className="text-[14px] font-bold text-[#111827] mb-2">Itens</p>
+        <p className="text-[14px] font-bold text-[#111827] mb-2">Itens adicionados</p>
 
         {/* Items list */}
         <div className="divide-y divide-[#F3F4F6]">
@@ -153,6 +164,19 @@ export function ReviewStep({
           })}
         </div>
       </div>
+
+      {/* Add more items (centered, below items) */}
+      {onEditItems && (
+        <div className="px-4 pb-2 pt-1">
+          <button
+            type="button"
+            onClick={onEditItems}
+            className="w-full text-center py-2 text-[14px] font-semibold text-[#DC2626]"
+          >
+            Adicionar mais itens
+          </button>
+        </div>
+      )}
 
       {/* ═══════ META INFO ═══════ */}
       <div className="mt-6 px-4 space-y-4">
@@ -284,18 +308,6 @@ export function ReviewStep({
         </p>
       </div>
 
-      {/* ═══════ EDIT ITEMS LINK ═══════ */}
-      {onEditItems && (
-        <div className="px-4 pb-2">
-          <button
-            type="button"
-            onClick={onEditItems}
-            className="w-full text-center py-2 text-[14px] font-bold text-[#DC2626]"
-          >
-            Editar pedido
-          </button>
-        </div>
-      )}
 
       {error && (
         <div className="px-4"><ErrorAlert message={error} /></div>
