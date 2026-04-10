@@ -129,11 +129,11 @@ export const useCheckoutStore = create<CheckoutState>()((set, get) => ({
     set({ loading: true, error: null });
     try {
       // 1. Clear server cart
-      await apiFetch("/cart", { method: "DELETE" });
+      await apiFetch("/cart/", { method: "DELETE" });
 
       // 2. Add each line to server cart
       for (const line of lines) {
-        await apiFetch(`/cart/items/${line.productId}`, {
+        await apiFetch(`/cart/items/${line.productId}/`, {
           method: "POST",
           body: JSON.stringify({
             quantity: line.quantity,
@@ -157,7 +157,7 @@ export const useCheckoutStore = create<CheckoutState>()((set, get) => ({
         orderBody.cashChangeAmount = cashChangeAmount;
       }
 
-      const order = await apiFetch<{ id: string }>("/orders", {
+      const order = await apiFetch<{ id: string }>("/orders/", {
         method: "POST",
         body: JSON.stringify(orderBody),
       });
