@@ -97,12 +97,12 @@ describe("useCheckoutStore", () => {
     expect(result).toEqual({ id: "order-1" });
 
     // 1st call: DELETE /cart
-    expect(mockedApiFetch).toHaveBeenNthCalledWith(1, "/cart", {
+    expect(mockedApiFetch).toHaveBeenNthCalledWith(1, "/cart/", {
       method: "DELETE",
     });
 
     // 2nd call: POST first item
-    expect(mockedApiFetch).toHaveBeenNthCalledWith(2, "/cart/items/p1", {
+    expect(mockedApiFetch).toHaveBeenNthCalledWith(2, "/cart/items/p1/", {
       method: "POST",
       body: JSON.stringify({
         quantity: 2,
@@ -112,7 +112,7 @@ describe("useCheckoutStore", () => {
     });
 
     // 3rd call: POST second item
-    expect(mockedApiFetch).toHaveBeenNthCalledWith(3, "/cart/items/p2", {
+    expect(mockedApiFetch).toHaveBeenNthCalledWith(3, "/cart/items/p2/", {
       method: "POST",
       body: JSON.stringify({
         quantity: 1,
@@ -121,7 +121,7 @@ describe("useCheckoutStore", () => {
     });
 
     // 4th call: POST /orders
-    expect(mockedApiFetch).toHaveBeenNthCalledWith(4, "/orders", {
+    expect(mockedApiFetch).toHaveBeenNthCalledWith(4, "/orders/", {
       method: "POST",
       body: expect.stringContaining('"restaurantId":"r1"'),
     });

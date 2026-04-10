@@ -98,19 +98,19 @@ describe("Checkout Flow (E2E)", () => {
     expect(calls).toHaveLength(4);
 
     // 1. DELETE /cart
-    expect(calls[0][0]).toBe(`${API_URL}/cart`);
+    expect(calls[0][0]).toBe(`${API_URL}/cart/`);
     expect(calls[0][1]).toMatchObject({ method: "DELETE" });
 
-    // 2. POST /cart/items/prod-1
-    expect(calls[1][0]).toBe(`${API_URL}/cart/items/prod-1`);
+    // 2. POST /cart/items/prod-1/
+    expect(calls[1][0]).toBe(`${API_URL}/cart/items/prod-1/`);
     expect(calls[1][1]).toMatchObject({ method: "POST" });
 
-    // 3. POST /cart/items/prod-2
-    expect(calls[2][0]).toBe(`${API_URL}/cart/items/prod-2`);
+    // 3. POST /cart/items/prod-2/
+    expect(calls[2][0]).toBe(`${API_URL}/cart/items/prod-2/`);
     expect(calls[2][1]).toMatchObject({ method: "POST" });
 
-    // 4. POST /orders
-    expect(calls[3][0]).toBe(`${API_URL}/orders`);
+    // 4. POST /orders/
+    expect(calls[3][0]).toBe(`${API_URL}/orders/`);
     expect(calls[3][1]).toMatchObject({ method: "POST" });
 
     const orderBody = JSON.parse(calls[3][1].body);
