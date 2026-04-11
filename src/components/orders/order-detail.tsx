@@ -1,10 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { ArrowLeft, Star, Store } from "lucide-react";
-import { apiFetch } from "@/lib/api";
+import { ArrowLeft, Store } from "lucide-react";
 import type { OrderDetail as OrderDetailType } from "@/lib/types";
-import { OrderReview } from "./order-review";
 import { STATUS_CONFIG, formatDate } from "./order-constants";
 import { OrderProgress } from "./order-progress";
 import {
@@ -20,32 +17,6 @@ interface OrderDetailProps {
 }
 
 export function OrderDetail({ order, onBack }: OrderDetailProps) {
-  const [showReview, setShowReview] = useState(false);
-  const [reviewRating, setReviewRating] = useState(0);
-  const [reviewComment, setReviewComment] = useState("");
-  const [reviewSubmitting, setReviewSubmitting] = useState(false);
-  const [reviewSubmitted, setReviewSubmitted] = useState(false);
-  const [reviewError, setReviewError] = useState<string | null>(null);
-
-  const handleSubmitReview = async () => {
-    if (reviewRating === 0) return;
-    setReviewSubmitting(true);
-    setReviewError(null);
-    try {
-      await apiFetch(`/orders/${order.id}/review/`, {
-        method: "POST",
-        body: JSON.stringify({ rating: reviewRating, comment: reviewComment }),
-      });
-      setReviewSubmitted(true);
-    } catch (err) {
-      setReviewError(
-        err instanceof Error ? err.message : "Erro ao enviar avaliacao."
-      );
-    } finally {
-      setReviewSubmitting(false);
-    }
-  };
-
   const cfg = STATUS_CONFIG[order.status] || STATUS_CONFIG.PENDING;
 
   return (
@@ -108,31 +79,6 @@ export function OrderDetail({ order, onBack }: OrderDetailProps) {
         deliveryFee={order.deliveryFee}
         total={order.total}
       />
-
-      {/* Review button */}
-      {order.status === "DELIVERED" && !showReview && !reviewSubmitted && (
-        <button
-          type="button"
-          onClick={() => setShowReview(true)}
-          className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#DC2626] px-4 py-3.5 text-[15px] font-bold text-white transition-colors hover:bg-[#B91C1C] mb-4"
-        >
-          <Star size={18} />
-          Avaliar pedido
-        </button>
-      )}
-
-      {(showReview || reviewSubmitted) && (
-        <OrderReview
-          rating={reviewRating}
-          comment={reviewComment}
-          submitting={reviewSubmitting}
-          submitted={reviewSubmitted}
-          error={reviewError}
-          onRatingChange={setReviewRating}
-          onCommentChange={setReviewComment}
-          onSubmit={handleSubmitReview}
-        />
-      )}
     </div>
   );
 }

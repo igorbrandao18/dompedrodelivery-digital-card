@@ -3,7 +3,7 @@
 import { useState } from "react";
 import type { Restaurant } from "@/lib/types";
 import { formatCurrency } from "@/lib/format";
-import { ShoppingBag, Star, Clock, Package, Truck, Info } from "lucide-react";
+import { ShoppingBag, Clock, Package, Truck, Info } from "lucide-react";
 import { RestaurantInfoModal } from "./restaurant-info-modal";
 
 interface RestaurantHeaderProps {
@@ -52,16 +52,6 @@ export function RestaurantHeader({ restaurant }: RestaurantHeaderProps) {
             </div>
 
             <div className="mt-3 flex flex-wrap items-center gap-2">
-              {restaurant.rating != null && (
-                <span className="flex items-center gap-1 rounded-full bg-[#FEF3C7] px-2.5 py-1 text-[12px] font-semibold text-[#92400E]">
-                  <Star className="h-3.5 w-3.5 fill-[#F59E0B] text-[#F59E0B]" />
-                  {restaurant.rating.toFixed(1)}
-                  {restaurant.ratingCount != null && (
-                    <span className="font-normal text-[#B45309]">({restaurant.ratingCount})</span>
-                  )}
-                </span>
-              )}
-
               <span className="flex items-center gap-1 rounded-full bg-[#FEE2E2] px-2.5 py-1 text-[12px] font-semibold text-[#DC2626]">
                 <Clock className="h-3.5 w-3.5" />
                 {restaurant.estimatedDeliveryMinutes} min

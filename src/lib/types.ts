@@ -9,8 +9,6 @@ export interface Restaurant {
   estimatedDeliveryMinutes: number;
   minOrderValue: number;
   deliveryFee: number;
-  rating?: number;
-  ratingCount?: number;
   phone?: string | null;
 }
 
