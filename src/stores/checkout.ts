@@ -2,12 +2,10 @@
 
 import { create } from "zustand";
 import type { UserAddress, FulfillmentMode, PaymentMethod, CartLine } from "@/lib/types";
-import { FAST_DELIVERY_SURCHARGE } from "@/lib/constants";
 import { apiFetch } from "@/lib/api";
 
 interface CheckoutState {
   fulfillmentMode: FulfillmentMode;
-  deliveryTier: "standard" | "fast";
   paymentMethod: PaymentMethod;
   cashChangeAmount: number | null;
   selectedAddressId: string;
@@ -16,7 +14,6 @@ interface CheckoutState {
   error: string | null;
 
   setFulfillmentMode: (mode: FulfillmentMode) => void;
-  setDeliveryTier: (tier: "standard" | "fast") => void;
   setPaymentMethod: (method: PaymentMethod) => void;
   setCashChangeAmount: (amount: number | null) => void;
   setSelectedAddressId: (id: string) => void;
@@ -30,7 +27,6 @@ interface CheckoutState {
 
 const initialState = {
   fulfillmentMode: "delivery" as FulfillmentMode,
-  deliveryTier: "standard" as "standard" | "fast",
   paymentMethod: "cash" as PaymentMethod,
   cashChangeAmount: null as number | null,
   selectedAddressId: "",
@@ -43,17 +39,14 @@ export const useCheckoutStore = create<CheckoutState>()((set, get) => ({
   ...initialState,
 
   setFulfillmentMode: (mode) => set({ fulfillmentMode: mode }),
-  setDeliveryTier: (tier) => set({ deliveryTier: tier }),
   setPaymentMethod: (method) => set({ paymentMethod: method }),
   setCashChangeAmount: (amount) => set({ cashChangeAmount: amount }),
   setSelectedAddressId: (id) => set({ selectedAddressId: id }),
 
   getDeliveryFee: (restaurantDeliveryFee: number) => {
-    const { fulfillmentMode, deliveryTier } = get();
+    const { fulfillmentMode } = get();
     if (fulfillmentMode === "pickup") return 0;
-    return deliveryTier === "fast"
-      ? restaurantDeliveryFee + FAST_DELIVERY_SURCHARGE
-      : restaurantDeliveryFee;
+    return restaurantDeliveryFee;
   },
 
   fetchAddresses: async (userId: string) => {
@@ -64,7 +57,6 @@ export const useCheckoutStore = create<CheckoutState>()((set, get) => ({
       );
       const addresses = Array.isArray(data) ? data : data.results || [];
       set({ addresses, loading: false });
-      // Auto-select default address
       const defaultAddr = addresses.find((a) => a.isDefault);
       if (defaultAddr && !get().selectedAddressId) {
         set({ selectedAddressId: defaultAddr.id });
@@ -73,7 +65,7 @@ export const useCheckoutStore = create<CheckoutState>()((set, get) => ({
       }
     } catch (err) {
       set({
-        error: err instanceof Error ? err.message : "Erro ao buscar enderecos",
+        error: err instanceof Error ? err.message : "Erro ao buscar endereços",
         loading: false,
       });
     }
@@ -84,10 +76,7 @@ export const useCheckoutStore = create<CheckoutState>()((set, get) => ({
     try {
       const newAddr = await apiFetch<UserAddress>(
         `/users/${userId}/addresses/`,
-        {
-          method: "POST",
-          body: JSON.stringify(data),
-        }
+        { method: "POST", body: JSON.stringify(data) }
       );
       set((s) => ({
         addresses: [...s.addresses, newAddr],
@@ -97,7 +86,7 @@ export const useCheckoutStore = create<CheckoutState>()((set, get) => ({
       return newAddr;
     } catch (err) {
       set({
-        error: err instanceof Error ? err.message : "Erro ao salvar endereco",
+        error: err instanceof Error ? err.message : "Erro ao salvar endereço",
         loading: false,
       });
       throw err;
@@ -118,20 +107,18 @@ export const useCheckoutStore = create<CheckoutState>()((set, get) => ({
       }));
     } catch (err) {
       set({
-        error: err instanceof Error ? err.message : "Erro ao remover endereco",
+        error: err instanceof Error ? err.message : "Erro ao remover endereço",
         loading: false,
       });
     }
   },
 
   submitOrder: async (lines: CartLine[], restaurantId: string) => {
-    const { fulfillmentMode, deliveryTier, selectedAddressId, paymentMethod, cashChangeAmount } = get();
+    const { fulfillmentMode, selectedAddressId, paymentMethod, cashChangeAmount } = get();
     set({ loading: true, error: null });
     try {
-      // 1. Clear server cart
       await apiFetch("/cart/", { method: "DELETE" });
 
-      // 2. Add each line to server cart
       for (const line of lines) {
         await apiFetch(`/cart/items/${line.productId}/`, {
           method: "POST",
@@ -143,7 +130,6 @@ export const useCheckoutStore = create<CheckoutState>()((set, get) => ({
         });
       }
 
-      // 3. Create order
       const orderBody: Record<string, unknown> = {
         restaurantId,
         paymentMethod,
@@ -151,7 +137,6 @@ export const useCheckoutStore = create<CheckoutState>()((set, get) => ({
       };
       if (fulfillmentMode === "delivery") {
         orderBody.addressId = selectedAddressId;
-        orderBody.deliveryTier = deliveryTier;
       }
       if (paymentMethod === "cash" && cashChangeAmount) {
         orderBody.cashChangeAmount = cashChangeAmount;

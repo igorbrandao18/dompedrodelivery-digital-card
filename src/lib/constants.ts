@@ -55,5 +55,3 @@ export const fontSize = {
 export const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
 export const CARDAPIO_DOMAIN = "dompedrodelivery.com.br";
 export const SERVICE_FEE = 0.99;
-export const BASE_DELIVERY_FEE = 5.99;
-export const FAST_DELIVERY_SURCHARGE = 3.00;

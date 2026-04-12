@@ -44,7 +44,6 @@ interface ReviewStepProps {
   restaurantName?: string;
   restaurantLogo?: string | null;
   estimatedMinutes?: number;
-  deliveryTier?: string;
   onEditAddress?: () => void;
   onEditPayment?: () => void;
   onEditItems?: () => void;
@@ -63,7 +62,6 @@ export function ReviewStep({
   restaurantName,
   restaurantLogo,
   estimatedMinutes = 40,
-  deliveryTier = "standard",
   onEditAddress,
   onEditPayment,
   onEditItems,
@@ -189,9 +187,9 @@ export function ReviewStep({
           }
           title={fulfillmentMode === "delivery" ? "Previsão de entrega" : "Previsão de retirada"}
           subtitle={
-            deliveryTier === "fast"
-              ? `Entrega rápida · ${estimatedMinutes - 15}–${estimatedMinutes - 5} min`
-              : `Entrega padrão · ${estimatedMinutes - 10}–${estimatedMinutes} min`
+            fulfillmentMode === "delivery"
+              ? `${estimatedMinutes}–${estimatedMinutes + 10} min`
+              : `${Math.max(10, estimatedMinutes - 20)}–${estimatedMinutes - 10} min`
           }
         />
 

@@ -51,7 +51,6 @@ export function CheckoutModal({ restaurant, onClose, onSuccess }: CheckoutModalP
   const clearAll = useCartStore((s) => s.clearAll);
 
   const fulfillmentMode = useCheckoutStore((s) => s.fulfillmentMode);
-  const deliveryTier = useCheckoutStore((s) => s.deliveryTier);
   const paymentMethod = useCheckoutStore((s) => s.paymentMethod);
   const cashChangeAmount = useCheckoutStore((s) => s.cashChangeAmount);
   const selectedAddressId = useCheckoutStore((s) => s.selectedAddressId);
@@ -60,7 +59,6 @@ export function CheckoutModal({ restaurant, onClose, onSuccess }: CheckoutModalP
   const error = useCheckoutStore((s) => s.error);
 
   const setFulfillmentMode = useCheckoutStore((s) => s.setFulfillmentMode);
-  const setDeliveryTier = useCheckoutStore((s) => s.setDeliveryTier);
   const setPaymentMethod = useCheckoutStore((s) => s.setPaymentMethod);
   const setCashChangeAmount = useCheckoutStore((s) => s.setCashChangeAmount);
   const setSelectedAddressId = useCheckoutStore((s) => s.setSelectedAddressId);
@@ -197,11 +195,8 @@ export function CheckoutModal({ restaurant, onClose, onSuccess }: CheckoutModalP
         {step === "fulfillment" && (
           <FulfillmentStep
             fulfillmentMode={fulfillmentMode}
-            deliveryTier={deliveryTier}
             selectedAddress={selectedAddress}
-            restaurantDeliveryFee={restaurant.deliveryFee}
             onSetFulfillmentMode={setFulfillmentMode}
-            onSetDeliveryTier={setDeliveryTier}
           />
         )}
 
@@ -255,7 +250,6 @@ export function CheckoutModal({ restaurant, onClose, onSuccess }: CheckoutModalP
             restaurantName={restaurant.name}
             restaurantLogo={restaurant.logoUrl}
             estimatedMinutes={restaurant.estimatedDeliveryMinutes}
-            deliveryTier={deliveryTier}
             onEditAddress={() => setStep(fulfillmentMode === "delivery" ? "address-select" : "fulfillment")}
             onEditPayment={() => setStep("payment")}
             onEditItems={onClose}
