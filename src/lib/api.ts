@@ -29,29 +29,13 @@ function sanitizeError(status: number, message?: string): string {
   }
 }
 
-// ── Refresh mutex ──
-let refreshPromise: Promise<boolean> | null = null;
+// ── Token management ──
+// Digital card uses Authorization header (NOT cookies) to avoid
+// session conflicts with the admin panel on the same API domain.
+let _authToken: string | null = null;
 
-async function tryRefreshOnce(): Promise<boolean> {
-  try {
-    const res = await fetch(`${API_URL}/auth/refresh`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({}),
-      credentials: "include",
-    });
-    return res.ok;
-  } catch {
-    return false;
-  }
-}
-
-function tryRefresh(): Promise<boolean> {
-  if (refreshPromise) return refreshPromise;
-  refreshPromise = tryRefreshOnce().finally(() => {
-    refreshPromise = null;
-  });
-  return refreshPromise;
+export function setAuthToken(token: string | null) {
+  _authToken = token;
 }
 
 // ── Main fetch function ──
@@ -63,6 +47,11 @@ export async function apiFetch<T = unknown>(path: string, options?: RequestInit)
     ...(options?.headers as Record<string, string> || {}),
   };
 
+  // Use Bearer token if available (customer session), no cookies
+  if (_authToken) {
+    headers["Authorization"] = `Bearer ${_authToken}`;
+  }
+
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), DEFAULT_TIMEOUT_MS);
 
@@ -70,7 +59,6 @@ export async function apiFetch<T = unknown>(path: string, options?: RequestInit)
   try {
     res = await fetch(`${API_URL}${path}`, {
       ...options,
-      credentials: "include",
       headers,
       signal: controller.signal,
     });
@@ -84,22 +72,9 @@ export async function apiFetch<T = unknown>(path: string, options?: RequestInit)
     clearTimeout(timeout);
   }
 
-  // Auto-refresh on 401
+  // 401 = token expired, clear session
   if (res.status === 401) {
-    const refreshed = await tryRefresh();
-    if (refreshed) {
-      const retry = await fetch(`${API_URL}${path}`, {
-        ...options,
-        credentials: "include",
-        headers,
-      });
-      if (!retry.ok) {
-        const body = await retry.json().catch(() => ({}));
-        throw new Error(sanitizeError(retry.status, body.message || body.detail));
-      }
-      if (retry.status === 204) return undefined as T;
-      return retry.json();
-    }
+    _authToken = null;
     throw new Error(sanitizeError(401));
   }
 
