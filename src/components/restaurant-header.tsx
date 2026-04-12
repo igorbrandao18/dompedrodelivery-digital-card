@@ -52,27 +52,31 @@ export function RestaurantHeader({ restaurant }: RestaurantHeaderProps) {
             </div>
 
             <div className="mt-3 flex flex-wrap items-center gap-2">
-              <span className="flex items-center gap-1 rounded-full bg-[#FEE2E2] px-2.5 py-1 text-[12px] font-semibold text-[#DC2626]">
-                <Clock className="h-3.5 w-3.5" />
-                {restaurant.estimatedDeliveryMinutes} min
-              </span>
+              {restaurant.estimatedDeliveryMinutes > 0 && (
+                <span className="flex items-center gap-1 rounded-full bg-[#FEE2E2] px-2.5 py-1 text-[12px] font-semibold text-[#DC2626]">
+                  <Clock className="h-3.5 w-3.5" />
+                  {restaurant.estimatedDeliveryMinutes}-{restaurant.estimatedDeliveryMinutes + 10} min
+                </span>
+              )}
 
-              <span className="flex items-center gap-1 rounded-full bg-[#FEE2E2] px-2.5 py-1 text-[12px] font-semibold text-[#DC2626]">
-                <Package className="h-3.5 w-3.5" />
-                Min. {formatCurrency(restaurant.minOrderValue)}
-              </span>
+              {restaurant.minOrderValue > 0 && (
+                <span className="flex items-center gap-1 rounded-full bg-[#FEE2E2] px-2.5 py-1 text-[12px] font-semibold text-[#DC2626]">
+                  <Package className="h-3.5 w-3.5" />
+                  Pedido min. {formatCurrency(restaurant.minOrderValue)}
+                </span>
+              )}
 
               {restaurant.deliveryFee === 0 ? (
                 <span className="flex items-center gap-1 rounded-full bg-[#D1FAE5] px-2.5 py-1 text-[12px] font-semibold text-[#065F46]">
                   <Truck className="h-3.5 w-3.5" />
-                  Entrega gratis
+                  Entrega grátis
                 </span>
-              ) : (
+              ) : restaurant.deliveryFee > 0 ? (
                 <span className="flex items-center gap-1 rounded-full bg-[#FEE2E2] px-2.5 py-1 text-[12px] font-semibold text-[#DC2626]">
                   <Truck className="h-3.5 w-3.5" />
                   Entrega {formatCurrency(restaurant.deliveryFee)}
                 </span>
-              )}
+              ) : null}
 
               {restaurant.isAcceptingOrders ? (
                 <span className="flex items-center gap-1 rounded-full bg-[#D1FAE5] px-2.5 py-1 text-[12px] font-semibold text-[#065F46]">
