@@ -29,28 +29,18 @@ function sanitizeError(status: number, message?: string): string {
   }
 }
 
-// ── Token management ──
-// Digital card uses Authorization header (NOT cookies) to avoid
-// session conflicts with the admin panel on the same API domain.
-let _authToken: string | null = null;
-
-export function setAuthToken(token: string | null) {
-  _authToken = token;
-}
-
 // ── Main fetch function ──
+// Digital card uses httpOnly cookies (customerAccessToken) via credentials:include.
+// X-Client-Type: customer tells the backend to use customer-prefixed cookies,
+// isolating the session from the admin panel (which uses accessToken).
 const DEFAULT_TIMEOUT_MS = 15_000;
 
 export async function apiFetch<T = unknown>(path: string, options?: RequestInit): Promise<T> {
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
+    "X-Client-Type": "customer",
     ...(options?.headers as Record<string, string> || {}),
   };
-
-  // Use Bearer token if available (customer session), no cookies
-  if (_authToken) {
-    headers["Authorization"] = `Bearer ${_authToken}`;
-  }
 
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), DEFAULT_TIMEOUT_MS);
@@ -59,6 +49,7 @@ export async function apiFetch<T = unknown>(path: string, options?: RequestInit)
   try {
     res = await fetch(`${API_URL}${path}`, {
       ...options,
+      credentials: "include",
       headers,
       signal: controller.signal,
     });
@@ -72,9 +63,7 @@ export async function apiFetch<T = unknown>(path: string, options?: RequestInit)
     clearTimeout(timeout);
   }
 
-  // 401 = token expired, clear session
   if (res.status === 401) {
-    _authToken = null;
     throw new Error(sanitizeError(401));
   }
 
