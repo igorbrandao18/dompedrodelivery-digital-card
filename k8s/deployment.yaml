@@ -4,10 +4,13 @@ metadata:
   name: digital-card
   namespace: dompedro
 spec:
+  type: NodePort
   selector:
     app: digital-card
   ports:
     - port: 3003
+      targetPort: 3000
+      nodePort: 30303
 ---
 apiVersion: apps/v1
 kind: Deployment
