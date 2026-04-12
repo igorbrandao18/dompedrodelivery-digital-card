@@ -27,6 +27,8 @@ export function useRestaurant(slug: string): UseRestaurantResult {
       const resto = await apiFetch<Restaurant>(
         `/restaurants/by-slug/${slug}/`
       );
+      // "Aberto" = toggle manual (isAcceptingOrders) + horário (isOpenNow)
+      resto.isAcceptingOrders = resto.isAcceptingOrders && resto.isOpenNow !== false;
       setRestaurant(resto);
 
       // Menu can load in parallel with setting restaurant state

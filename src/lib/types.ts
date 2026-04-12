@@ -6,6 +6,7 @@ export interface Restaurant {
   logoUrl: string | null;
   bannerUrl: string | null;
   isAcceptingOrders: boolean;
+  isOpenNow?: boolean;
   estimatedDeliveryMinutes: number;
   minOrderValue: number;
   deliveryFee: number;
