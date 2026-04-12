@@ -45,11 +45,6 @@ describe("Checkout Flow (E2E)", () => {
     expect(useCheckoutStore.getState().fulfillmentMode).toBe("pickup");
   });
 
-  it("sets delivery tier", () => {
-    useCheckoutStore.getState().setDeliveryTier("fast");
-    expect(useCheckoutStore.getState().deliveryTier).toBe("fast");
-  });
-
   it("sets payment method", () => {
     useCheckoutStore.getState().setPaymentMethod("credit_visa");
     expect(useCheckoutStore.getState().paymentMethod).toBe("credit_visa");
@@ -60,16 +55,9 @@ describe("Checkout Flow (E2E)", () => {
     expect(useCheckoutStore.getState().getDeliveryFee(5.99)).toBe(0);
   });
 
-  it("getDeliveryFee returns restaurant fee for standard delivery", () => {
+  it("getDeliveryFee returns restaurant fee for delivery", () => {
     useCheckoutStore.getState().setFulfillmentMode("delivery");
-    useCheckoutStore.getState().setDeliveryTier("standard");
     expect(useCheckoutStore.getState().getDeliveryFee(5.99)).toBe(5.99);
-  });
-
-  it("getDeliveryFee returns restaurant fee + surcharge for fast delivery", () => {
-    useCheckoutStore.getState().setFulfillmentMode("delivery");
-    useCheckoutStore.getState().setDeliveryTier("fast");
-    expect(useCheckoutStore.getState().getDeliveryFee(5.99)).toBe(5.99 + 3.0);
   });
 
   it("submitOrder calls DELETE /cart, POST items, POST /orders in sequence", async () => {
@@ -79,14 +67,13 @@ describe("Checkout Flow (E2E)", () => {
     ];
 
     mockFetchSequence([
-      { body: undefined, status: 204 }, // DELETE /cart
-      { body: {} },                      // POST /cart/items/prod-1
-      { body: {} },                      // POST /cart/items/prod-2
-      { body: { id: "order-123" } },     // POST /orders
+      { body: undefined, status: 204 },
+      { body: {} },
+      { body: {} },
+      { body: { id: "order-123" } },
     ]);
 
     useCheckoutStore.getState().setFulfillmentMode("delivery");
-    useCheckoutStore.getState().setDeliveryTier("standard");
     useCheckoutStore.getState().setPaymentMethod("cash");
     useCheckoutStore.getState().setSelectedAddressId("addr-1");
 
@@ -97,19 +84,15 @@ describe("Checkout Flow (E2E)", () => {
     const calls = (globalThis.fetch as ReturnType<typeof vi.fn>).mock.calls;
     expect(calls).toHaveLength(4);
 
-    // 1. DELETE /cart
     expect(calls[0][0]).toBe(`${API_URL}/cart/`);
     expect(calls[0][1]).toMatchObject({ method: "DELETE" });
 
-    // 2. POST /cart/items/prod-1/
     expect(calls[1][0]).toBe(`${API_URL}/cart/items/prod-1/`);
     expect(calls[1][1]).toMatchObject({ method: "POST" });
 
-    // 3. POST /cart/items/prod-2/
     expect(calls[2][0]).toBe(`${API_URL}/cart/items/prod-2/`);
     expect(calls[2][1]).toMatchObject({ method: "POST" });
 
-    // 4. POST /orders/
     expect(calls[3][0]).toBe(`${API_URL}/orders/`);
     expect(calls[3][1]).toMatchObject({ method: "POST" });
 
@@ -119,7 +102,6 @@ describe("Checkout Flow (E2E)", () => {
       paymentMethod: "cash",
       fulfillmentMode: "delivery",
       addressId: "addr-1",
-      deliveryTier: "standard",
     });
   });
 
@@ -145,7 +127,6 @@ describe("Checkout Flow (E2E)", () => {
 
   it("reset clears all state", () => {
     useCheckoutStore.getState().setFulfillmentMode("pickup");
-    useCheckoutStore.getState().setDeliveryTier("fast");
     useCheckoutStore.getState().setPaymentMethod("credit_visa");
     useCheckoutStore.getState().setCashChangeAmount(100);
     useCheckoutStore.getState().setSelectedAddressId("addr-99");
@@ -154,7 +135,6 @@ describe("Checkout Flow (E2E)", () => {
 
     const state = useCheckoutStore.getState();
     expect(state.fulfillmentMode).toBe("delivery");
-    expect(state.deliveryTier).toBe("standard");
     expect(state.paymentMethod).toBe("cash");
     expect(state.cashChangeAmount).toBeNull();
     expect(state.selectedAddressId).toBe("");

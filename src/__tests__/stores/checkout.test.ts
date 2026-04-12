@@ -1,6 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
-// Mock apiFetch before importing the store
 vi.mock("@/lib/api", () => ({
   apiFetch: vi.fn(),
 }));
@@ -19,7 +18,6 @@ describe("useCheckoutStore", () => {
   it("has initial state with fulfillmentMode set to 'delivery'", () => {
     const state = useCheckoutStore.getState();
     expect(state.fulfillmentMode).toBe("delivery");
-    expect(state.deliveryTier).toBe("standard");
     expect(state.paymentMethod).toBe("cash");
     expect(state.selectedAddressId).toBe("");
     expect(state.loading).toBe(false);
@@ -29,11 +27,6 @@ describe("useCheckoutStore", () => {
   it("setFulfillmentMode changes the mode", () => {
     useCheckoutStore.getState().setFulfillmentMode("pickup");
     expect(useCheckoutStore.getState().fulfillmentMode).toBe("pickup");
-  });
-
-  it("setDeliveryTier changes the tier", () => {
-    useCheckoutStore.getState().setDeliveryTier("fast");
-    expect(useCheckoutStore.getState().deliveryTier).toBe("fast");
   });
 
   it("setPaymentMethod changes the method", () => {
@@ -46,10 +39,19 @@ describe("useCheckoutStore", () => {
     expect(useCheckoutStore.getState().selectedAddressId).toBe("addr-123");
   });
 
+  it("getDeliveryFee returns 0 for pickup", () => {
+    useCheckoutStore.getState().setFulfillmentMode("pickup");
+    expect(useCheckoutStore.getState().getDeliveryFee(7)).toBe(0);
+  });
+
+  it("getDeliveryFee returns restaurant fee for delivery", () => {
+    useCheckoutStore.getState().setFulfillmentMode("delivery");
+    expect(useCheckoutStore.getState().getDeliveryFee(7)).toBe(7);
+  });
+
   it("reset clears all state back to initial values", () => {
     const store = useCheckoutStore.getState();
     store.setFulfillmentMode("pickup");
-    store.setDeliveryTier("fast");
     store.setPaymentMethod("credit_visa");
     store.setSelectedAddressId("addr-123");
 
@@ -57,7 +59,6 @@ describe("useCheckoutStore", () => {
 
     const state = useCheckoutStore.getState();
     expect(state.fulfillmentMode).toBe("delivery");
-    expect(state.deliveryTier).toBe("standard");
     expect(state.paymentMethod).toBe("cash");
     expect(state.selectedAddressId).toBe("");
   });
@@ -95,37 +96,19 @@ describe("useCheckoutStore", () => {
     const result = await useCheckoutStore.getState().submitOrder(lines, "r1");
 
     expect(result).toEqual({ id: "order-1" });
-
-    // 1st call: DELETE /cart
-    expect(mockedApiFetch).toHaveBeenNthCalledWith(1, "/cart/", {
-      method: "DELETE",
-    });
-
-    // 2nd call: POST first item
+    expect(mockedApiFetch).toHaveBeenNthCalledWith(1, "/cart/", { method: "DELETE" });
     expect(mockedApiFetch).toHaveBeenNthCalledWith(2, "/cart/items/p1/", {
       method: "POST",
-      body: JSON.stringify({
-        quantity: 2,
-        optionIds: ["opt1"],
-        customerNote: "No onions",
-      }),
+      body: JSON.stringify({ quantity: 2, optionIds: ["opt1"], customerNote: "No onions" }),
     });
-
-    // 3rd call: POST second item
     expect(mockedApiFetch).toHaveBeenNthCalledWith(3, "/cart/items/p2/", {
       method: "POST",
-      body: JSON.stringify({
-        quantity: 1,
-        optionIds: [],
-      }),
+      body: JSON.stringify({ quantity: 1, optionIds: [] }),
     });
-
-    // 4th call: POST /orders
     expect(mockedApiFetch).toHaveBeenNthCalledWith(4, "/orders/", {
       method: "POST",
       body: expect.stringContaining('"restaurantId":"r1"'),
     });
-
     expect(useCheckoutStore.getState().loading).toBe(false);
   });
 });
