@@ -23,17 +23,26 @@ export function useRestaurant(slug: string): UseRestaurantResult {
     setLoading(true);
     setError("");
     try {
+      // Fetch restaurant first (need the id for menu endpoint)
       const resto = await apiFetch<Restaurant>(
         `/restaurants/by-slug/${slug}/`
       );
       setRestaurant(resto);
 
+      // Menu can load in parallel with setting restaurant state
       const menu = await apiFetch<{ categories: MenuCategory[] }>(
         `/restaurants/${resto.id}/menu/`
       );
       setCategories(menu.categories || []);
-    } catch {
-      setError("Restaurante não encontrado");
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "";
+      if (msg.includes("404") || msg.includes("não encontrado")) {
+        setError("Restaurante não encontrado. Verifique o endereço.");
+      } else if (msg.includes("timeout") || msg.includes("network")) {
+        setError("Erro de conexão. Verifique sua internet e tente novamente.");
+      } else {
+        setError("Não foi possível carregar o restaurante. Tente novamente.");
+      }
     } finally {
       setLoading(false);
     }

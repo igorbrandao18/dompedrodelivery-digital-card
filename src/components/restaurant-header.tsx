@@ -92,19 +92,25 @@ export function RestaurantHeader({ restaurant }: RestaurantHeaderProps) {
           </div>
 
           {/* Right: logo */}
-          {restaurant.logoUrl && (
-            <div className="-mt-16">
-              <div
-                className="h-[120px] w-[120px] overflow-hidden rounded-full border-[3px] border-[rgba(220,38,38,0.35)] shadow-[0_4px_12px_rgba(220,38,38,0.25)]"
-              >
+          <div className="-mt-16">
+            <div
+              className="h-[120px] w-[120px] overflow-hidden rounded-full border-[3px] border-[rgba(220,38,38,0.35)] shadow-[0_4px_12px_rgba(220,38,38,0.25)]"
+            >
+              {restaurant.logoUrl ? (
                 <img
                   src={restaurant.logoUrl}
                   alt={`Logo de ${restaurant.name}`}
                   className="h-full w-full object-cover"
                 />
-              </div>
+              ) : (
+                <div className="flex h-full w-full items-center justify-center bg-[#FEE2E2]">
+                  <span className="text-3xl font-bold text-[#DC2626]">
+                    {restaurant.name.charAt(0).toUpperCase()}
+                  </span>
+                </div>
+              )}
             </div>
-          )}
+          </div>
         </div>
       </div>
 

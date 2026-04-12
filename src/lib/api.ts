@@ -55,17 +55,34 @@ function tryRefresh(): Promise<boolean> {
 }
 
 // ── Main fetch function ──
+const DEFAULT_TIMEOUT_MS = 15_000;
+
 export async function apiFetch<T = unknown>(path: string, options?: RequestInit): Promise<T> {
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
     ...(options?.headers as Record<string, string> || {}),
   };
 
-  const res = await fetch(`${API_URL}${path}`, {
-    ...options,
-    credentials: "include",
-    headers,
-  });
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), DEFAULT_TIMEOUT_MS);
+
+  let res: Response;
+  try {
+    res = await fetch(`${API_URL}${path}`, {
+      ...options,
+      credentials: "include",
+      headers,
+      signal: controller.signal,
+    });
+  } catch (err) {
+    clearTimeout(timeout);
+    if (err instanceof DOMException && err.name === "AbortError") {
+      throw new Error("A conexão demorou demais. Verifique sua internet.");
+    }
+    throw err;
+  } finally {
+    clearTimeout(timeout);
+  }
 
   // Auto-refresh on 401
   if (res.status === 401) {

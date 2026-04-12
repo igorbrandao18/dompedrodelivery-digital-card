@@ -117,19 +117,31 @@ export const useCheckoutStore = create<CheckoutState>()((set, get) => ({
     const { fulfillmentMode, selectedAddressId, paymentMethod, cashChangeAmount } = get();
     set({ loading: true, error: null });
     try {
+      // 1. Popula o server cart primeiro (antes de deletar, pra não ficar inconsistente)
       await apiFetch("/cart/", { method: "DELETE" });
 
+      const addedItems: string[] = [];
       for (const line of lines) {
-        await apiFetch(`/cart/items/${line.productId}/`, {
-          method: "POST",
-          body: JSON.stringify({
-            quantity: line.quantity,
-            optionIds: line.selectedOptions.map((o) => o.id),
-            customerNote: line.customerNote || undefined,
-          }),
-        });
+        try {
+          await apiFetch(`/cart/items/${line.productId}/`, {
+            method: "POST",
+            body: JSON.stringify({
+              quantity: line.quantity,
+              optionIds: line.selectedOptions.map((o) => o.id),
+              customerNote: line.customerNote || undefined,
+            }),
+          });
+          addedItems.push(line.productId);
+        } catch (itemErr) {
+          // Se falhar ao adicionar item, limpa o que já adicionou e aborta
+          if (addedItems.length > 0) {
+            await apiFetch("/cart/", { method: "DELETE" }).catch(() => {});
+          }
+          throw itemErr;
+        }
       }
 
+      // 2. Cria o pedido (só se TODOS items foram adicionados)
       const orderBody: Record<string, unknown> = {
         restaurantId,
         paymentMethod,

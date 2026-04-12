@@ -74,7 +74,10 @@ export function OrdersTab({
   }, []);
 
   useEffect(() => {
-    if (authed) fetchOrders();
+    if (!authed) return;
+    fetchOrders();
+    const interval = setInterval(fetchOrders, 10000);
+    return () => clearInterval(interval);
   }, [authed, fetchOrders]);
 
   if (!authed) {

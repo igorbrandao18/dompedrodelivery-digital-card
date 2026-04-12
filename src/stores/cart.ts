@@ -1,6 +1,7 @@
 "use client";
 
 import { create } from "zustand";
+import { persist } from "zustand/middleware";
 import type { CartLine } from "@/lib/types";
 
 interface CartState {
@@ -17,7 +18,9 @@ function generateId() {
   return Math.random().toString(36).slice(2, 10);
 }
 
-export const useCartStore = create<CartState>()((set, get) => ({
+export const useCartStore = create<CartState>()(
+  persist(
+    (set, get) => ({
   lines: [],
 
   addItem: (item) => {
@@ -78,4 +81,7 @@ export const useCartStore = create<CartState>()((set, get) => ({
   getItemCount: () => {
     return get().lines.reduce((sum, l) => sum + l.quantity, 0);
   },
-}));
+}),
+    { name: "dompedro-cart" },
+  ),
+);

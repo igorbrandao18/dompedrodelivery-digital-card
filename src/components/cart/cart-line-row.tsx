@@ -56,7 +56,7 @@ export function CartLineRow({ line, onSetQty }: CartLineRowProps) {
           <button
             type="button"
             onClick={() => onSetQty(line.lineId, line.quantity - 1)}
-            className="flex h-7 w-7 items-center justify-center rounded-full border border-[#E5E7EB] text-[#6B7280] transition-colors hover:bg-[#F3F4F6]"
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-[#E5E7EB] text-[#6B7280] transition-colors hover:bg-[#F3F4F6]"
           >
             {line.quantity === 1 ? (
               <Trash2 className="h-3.5 w-3.5 text-[#DC2626]" />
@@ -70,7 +70,7 @@ export function CartLineRow({ line, onSetQty }: CartLineRowProps) {
           <button
             type="button"
             onClick={() => onSetQty(line.lineId, line.quantity + 1)}
-            className="flex h-7 w-7 items-center justify-center rounded-full border border-[#E5E7EB] text-[#6B7280] transition-colors hover:bg-[#F3F4F6]"
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-[#E5E7EB] text-[#6B7280] transition-colors hover:bg-[#F3F4F6]"
           >
             <Plus className="h-3.5 w-3.5" />
           </button>
