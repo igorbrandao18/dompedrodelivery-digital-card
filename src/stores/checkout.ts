@@ -46,7 +46,7 @@ export const useCheckoutStore = create<CheckoutState>()((set, get) => ({
   getDeliveryFee: (restaurantDeliveryFee: number) => {
     const { fulfillmentMode } = get();
     if (fulfillmentMode === "pickup") return 0;
-    return restaurantDeliveryFee;
+    return restaurantDeliveryFee || 0;
   },
 
   fetchAddresses: async (userId: string) => {
