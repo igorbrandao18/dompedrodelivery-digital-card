@@ -46,13 +46,13 @@ export default function CardapioPage() {
     restoreSession();
   }, [restoreSession]);
 
-  // Expand first category on load
+  // Expand first category once when menu loads
+  const didExpandFirst = useRef(false);
   useEffect(() => {
-    if (categories.length > 0 && expandedCats.size === 0) {
+    if (categories.length > 0 && !didExpandFirst.current) {
+      didExpandFirst.current = true;
       setExpandedCats(new Set([categories[0].id]));
     }
-    // Only run when categories load, not on every expandedCats change
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [categories]);
 
   const toggleCategory = (id: string) => {

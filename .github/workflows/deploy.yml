@@ -17,9 +17,10 @@ jobs:
           node-version: "20"
           cache: npm
 
-      - name: Run tests
+      - name: Lint & Test
         run: |
           npm ci
+          npx next lint
           npx vitest run
 
       - name: Build image

@@ -5,7 +5,10 @@ import { useEffect, useRef } from "react";
 /** Calls `handler` when the Escape key is pressed. */
 export function useEscapeKey(handler: () => void) {
   const handlerRef = useRef(handler);
-  handlerRef.current = handler;
+
+  useEffect(() => {
+    handlerRef.current = handler;
+  });
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {

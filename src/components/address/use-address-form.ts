@@ -44,14 +44,19 @@ interface UseAddressFormOpts {
 }
 
 export function useAddressForm(opts: UseAddressFormOpts) {
-  const [street, setStreet] = useState(opts.initialStreet);
+  const {
+    initialStreet, initialNeighborhood, initialCity, initialState, initialZipCode,
+    lat, lng, onLatLngChange, onSave, miniMapInstance, saveRef: saveRefProp,
+  } = opts;
+
+  const [street, setStreet] = useState(initialStreet);
   const [number, setNumber] = useState("");
   const [complement, setComplement] = useState("");
   const [referenceNote, setReferenceNote] = useState("");
-  const [neighborhood, setNeighborhood] = useState(opts.initialNeighborhood);
-  const [city, setCity] = useState(opts.initialCity);
-  const [state, setState] = useState(opts.initialState);
-  const [zipCode, setZipCode] = useState(opts.initialZipCode);
+  const [neighborhood, setNeighborhood] = useState(initialNeighborhood);
+  const [city, setCity] = useState(initialCity);
+  const [state, setState] = useState(initialState);
+  const [zipCode, setZipCode] = useState(initialZipCode);
   const [noNumber, setNoNumber] = useState(false);
   const [cepLoading, setCepLoading] = useState(false);
   const [formError, setFormError] = useState("");
@@ -79,9 +84,9 @@ export function useAddressForm(opts: UseAddressFormOpts) {
             if (results.length > 0) {
               const newLat = parseFloat(results[0].lat);
               const newLng = parseFloat(results[0].lon);
-              opts.onLatLngChange(newLat, newLng);
-              if (opts.miniMapInstance.current) {
-                const map = opts.miniMapInstance.current as {
+              onLatLngChange(newLat, newLng);
+              if (miniMapInstance.current) {
+                const map = miniMapInstance.current as {
                   setView: (c: [number, number], z: number) => void;
                   eachLayer: (fn: (l: { setLatLng?: (c: [number, number]) => void }) => void) => void;
                 };
@@ -104,18 +109,19 @@ export function useAddressForm(opts: UseAddressFormOpts) {
     if (!number.trim() && !noNumber) { setFormError("Informe o número ou marque 'Sem número'."); return; }
     if (!neighborhood.trim()) { setFormError("Informe o bairro."); return; }
     if (!city.trim()) { setFormError("Informe a cidade."); return; }
-    opts.onSave({
+    onSave({
       street: street.trim(), number: noNumber ? "S/N" : number.trim(),
       complement: complement.trim(), referenceNote: referenceNote.trim(),
       neighborhood: neighborhood.trim(), city: city.trim(),
       state: state.trim() || "CE", zipCode: zipCode.replace(/\D/g, ""),
-      latitude: opts.lat, longitude: opts.lng,
+      latitude: lat, longitude: lng,
     });
   };
 
+  const saveRef = saveRefProp;
   useEffect(() => {
-    if (opts.saveRef) opts.saveRef.current = handleSave;
-    return () => { if (opts.saveRef) opts.saveRef.current = null; };
+    if (saveRef) saveRef.current = handleSave;
+    return () => { if (saveRef) saveRef.current = null; };
   });
 
   return {

@@ -7,7 +7,7 @@ export function middleware(request: NextRequest) {
   const host = hostname.split(":")[0];
 
   // Extract slug from subdomain: burguer-do-igor.dompedrodelivery.com.br -> burguer-do-igor
-  let slug = host.replace(".dompedrodelivery.com.br", "");
+  const slug = host.replace(".dompedrodelivery.com.br", "");
 
   // Local dev: no subdomain available, use ?slug= query param
   if (!slug || slug === host || slug.includes(".") || host === "localhost") {
