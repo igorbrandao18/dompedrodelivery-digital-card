@@ -240,6 +240,7 @@ export function CheckoutModal({ restaurant, onClose, onSuccess }: CheckoutModalP
           <PaymentStep
             paymentMethod={paymentMethod}
             cashChangeAmount={cashChangeAmount}
+            acceptedMethods={restaurant.acceptedPaymentMethods}
             onSetPaymentMethod={setPaymentMethod}
             onSetCashChangeAmount={setCashChangeAmount}
           />

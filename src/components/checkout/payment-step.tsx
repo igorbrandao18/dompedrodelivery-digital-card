@@ -28,6 +28,7 @@ export const PAYMENT_OPTIONS = [
 interface PaymentStepProps {
   paymentMethod: PaymentMethod;
   cashChangeAmount: number | null;
+  acceptedMethods?: string[];
   onSetPaymentMethod: (method: PaymentMethod) => void;
   onSetCashChangeAmount: (amount: number | null) => void;
 }
@@ -35,9 +36,17 @@ interface PaymentStepProps {
 export function PaymentStep({
   paymentMethod,
   cashChangeAmount,
+  acceptedMethods,
   onSetPaymentMethod,
   onSetCashChangeAmount,
 }: PaymentStepProps) {
+  const isAccepted = (method: string) => {
+    if (!acceptedMethods || acceptedMethods.length === 0) return true;
+    if (method === "cash") return acceptedMethods.includes("cash");
+    if (method === "pix") return acceptedMethods.includes("pix");
+    if (method.startsWith("credit_")) return acceptedMethods.includes("credit_card");
+    return true;
+  };
   const [showChangeSheet, setShowChangeSheet] = useState(false);
   const [changeInput, setChangeInput] = useState("");
 
