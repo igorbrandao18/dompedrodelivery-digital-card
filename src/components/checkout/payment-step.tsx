@@ -3,6 +3,7 @@
 import { useState } from "react";
 import type { PaymentMethod } from "@/lib/types";
 import { X } from "lucide-react";
+import { QrCode } from "lucide-react";
 import {
   VisaIcon,
   MastercardIcon,
@@ -94,6 +95,36 @@ export function PaymentStep({
             </span>
           </button>
         )}
+      </div>
+
+      {/* ── PIX section ── */}
+      <div>
+        <p className="text-[12px] font-bold text-[#6B7280] uppercase tracking-wider mb-3">
+          PIX
+        </p>
+        <button
+          type="button"
+          onClick={() => onSetPaymentMethod("pix")}
+          className={`flex w-full items-center gap-4 rounded-[14px] p-4 transition-all ${
+            paymentMethod === "pix"
+              ? "bg-[#FEF2F2] ring-2 ring-[#DC2626]"
+              : "bg-[#F9FAFB] hover:bg-[#F3F4F6]"
+          }`}
+        >
+          <div className="flex h-11 w-[44px] items-center justify-center">
+            <QrCode size={32} className="text-[#32BCAD]" />
+          </div>
+          <span className="flex-1 text-left text-[15px] font-semibold text-[#111827]">
+            PIX
+          </span>
+          <div className={`h-5 w-5 rounded-full border-2 flex items-center justify-center ${
+            paymentMethod === "pix" ? "border-[#DC2626]" : "border-[#D1D5DB]"
+          }`}>
+            {paymentMethod === "pix" && (
+              <div className="h-2.5 w-2.5 rounded-full bg-[#DC2626]" />
+            )}
+          </div>
+        </button>
       </div>
 
       {/* ── Credit cards section ── */}

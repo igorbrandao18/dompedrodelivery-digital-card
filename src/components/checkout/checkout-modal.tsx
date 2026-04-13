@@ -15,6 +15,7 @@ import { AddressSelectStep } from "./address-select-step";
 import { PaymentStep } from "./payment-step";
 import { ReviewStep } from "./review-step";
 import { ProcessingStep } from "./processing-step";
+import { PixPaymentStep } from "./pix-payment-step";
 
 type CheckoutStep =
   | "fulfillment"
@@ -23,6 +24,7 @@ type CheckoutStep =
   | "payment"
   | "review"
   | "processing"
+  | "pix-payment"
   | "success";
 
 interface CheckoutModalProps {
@@ -38,12 +40,14 @@ const STEP_TITLES: Record<CheckoutStep, string> = {
   payment: "Pagamento",
   review: "Revisar pedido",
   processing: "Processando",
+  "pix-payment": "Pagamento PIX",
   success: "Pedido enviado",
 };
 
 export function CheckoutModal({ restaurant, onClose, onSuccess }: CheckoutModalProps) {
   const addressSaveRef = useRef<(() => void) | null>(null);
   const [step, setStep] = useState<CheckoutStep>("fulfillment");
+  const [orderId, setOrderId] = useState<string | null>(null);
 
   const user = useAuthStore((s) => s.user);
   const lines = useCartStore((s) => s.lines);
@@ -100,9 +104,14 @@ export function CheckoutModal({ restaurant, onClose, onSuccess }: CheckoutModalP
   const handleSubmitOrder = async () => {
     setStep("processing");
     try {
-      await submitOrder(lines, restaurant.id);
+      const order = await submitOrder(lines, restaurant.id);
       clearAll();
-      setStep("success");
+      if (paymentMethod === "pix") {
+        setOrderId(order.id);
+        setStep("pix-payment");
+      } else {
+        setStep("success");
+      }
     } catch {
       setStep("review");
     }
@@ -164,7 +173,7 @@ export function CheckoutModal({ restaurant, onClose, onSuccess }: CheckoutModalP
   return (
     <div className="fixed inset-0 z-[70] flex flex-col bg-white">
       {/* Top bar */}
-      {step !== "processing" && step !== "success" && (
+      {step !== "processing" && step !== "pix-payment" && step !== "success" && (
         <div className="flex items-center justify-between border-b border-[#E5E7EB] px-4 h-14 shrink-0">
           <button
             type="button"
@@ -253,6 +262,13 @@ export function CheckoutModal({ restaurant, onClose, onSuccess }: CheckoutModalP
             onEditAddress={() => setStep(fulfillmentMode === "delivery" ? "address-select" : "fulfillment")}
             onEditPayment={() => setStep("payment")}
             onEditItems={onClose}
+          />
+        )}
+
+        {step === "pix-payment" && orderId && (
+          <PixPaymentStep
+            orderId={orderId}
+            onSuccess={() => setStep("success")}
           />
         )}
 

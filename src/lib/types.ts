@@ -102,4 +102,4 @@ export interface OrderDetailItem {
 }
 
 export type FulfillmentMode = "delivery" | "pickup";
-export type PaymentMethod = "cash" | "credit_visa" | "credit_mastercard" | "credit_elo" | "credit_hipercard";
+export type PaymentMethod = "cash" | "pix" | "credit_visa" | "credit_mastercard" | "credit_elo" | "credit_hipercard";
