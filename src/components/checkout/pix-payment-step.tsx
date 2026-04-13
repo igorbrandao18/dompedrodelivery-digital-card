@@ -99,8 +99,13 @@ export function PixPaymentStep({ orderId, onSuccess }: PixPaymentStepProps) {
           }
         }, 1000);
 
-        // Start polling for payment status
+        // Start polling for payment status (auto-stops on expiration)
         pollRef.current = setInterval(() => {
+          if (Date.now() >= expiresAt) {
+            if (pollRef.current) clearInterval(pollRef.current);
+            pollRef.current = null;
+            return;
+          }
           checkStatus();
         }, POLL_INTERVAL_MS);
 
